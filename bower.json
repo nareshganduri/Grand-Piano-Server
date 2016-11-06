@@ -1,0 +1,17 @@
+{
+  "name": "grand-piano",
+  "version": "0.0",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "public/lib"
+  ],
+  "dependencies": {
+    "jquery-2.1.3.min": "http://code.jquery.com/jquery-2.1.3.min.js",
+    "angular": "~1.3.13",
+    "angular-route": "~1.3.14",
+    "jquery-unveil": "^1.3.0",
+    "jquery_lazyload": "jquery.lazyload#^1.9.7"
+  }
+}

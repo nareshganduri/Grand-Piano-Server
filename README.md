@@ -8,3 +8,9 @@ The premise of this visualizer is to allow it to be streamed to some online webs
     - ACM Cluster
     - Heroku
 2. Visualization Library
+
+# Run commands
+
+1. `npm install`
+2. `bower install`
+3. `node app.js`
