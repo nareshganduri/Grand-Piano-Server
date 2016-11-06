@@ -1,10 +1,8 @@
 var express = require('express');
 var app = express();
 
-app.get('/', function (req, res) {
-      res.send('Hello World!');
-});
+app.use(express.static(__dirname + '/public'));
 
-app.listen((process.env.PORT || 3000), function () {
-      console.log('Example app listening on port 3000!');
-});
+var port = process.env.PORT || 3000;
+console.log("Express server running on " + port);
+app.listen(process.env.PORT || port);
