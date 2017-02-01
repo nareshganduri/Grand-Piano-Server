@@ -17,19 +17,24 @@ module.exports = function(grunt) {
           'public/js/app.js': ['source_js/app.js'],
           'public/js/controllers.js': ['source_js/controllers.js'],
           'public/js/services.js': ['source_js/services.js'],
+          'public/js/controls.js': ['source_js/controls.js'],
         } //files
       } //my_target
     }, //uglify
     copy: {
-      files: {
-            expand : true,
-            dest   : 'public/js',
-            cwd    : 'js',
-            src    : [
-              '**/*.js'
-            ]
-      }
-    },
+      main: {
+        files: [
+          {
+                expand : true,
+                dest   : 'public/js',
+                cwd    : 'js',
+                src    : [
+                  '**/*.js'
+                ]
+          }
+        ] //files
+      }//main
+    },//copy
     compass: {
       dev: {
         options: {
@@ -64,6 +69,6 @@ module.exports = function(grunt) {
         }
       }
   }
-  }) //initConfig
-  grunt.registerTask('default', ['express:dev', 'watch', 'uglify']);
-} //exports
+  }); //initConfig
+  grunt.registerTask('default', ['express:dev', 'watch', 'copy', 'uglify']);
+}; //exports
