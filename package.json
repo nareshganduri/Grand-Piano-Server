@@ -4,7 +4,7 @@
   "description": "The premise of this visualizer is to allow it to be streamed to some online website where we can then access it through the Siebel Center's video wall.",
   "main": "app.js",
   "scripts": {
-    "postinstall": "bower install; grunt uglify; grunt copy;",
+    "postinstall": "bower install && grunt uglify && grunt copy;",
     "start": "node app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -21,9 +21,10 @@
     "angular-datepicker": "^1.0.5",
     "angular-material": "^1.0.6",
     "angular-messages": "^1.5.2",
+    "bower": "^1.8.0",
     "clipboard": "^1.5.10",
     "express": "^4.11.1",
-    "grunt": "0.4.5",
+    "grunt": "^0.4.5",
     "grunt-cli": "1.2.0",
     "grunt-contrib-clean": "^0.6.0",
     "grunt-contrib-compass": "~0.5.0",
