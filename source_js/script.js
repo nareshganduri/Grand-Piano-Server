@@ -62,7 +62,7 @@ Physics(function (world) {
     edgeBounce = Physics.behavior('edge-collision-detection', {
         aabb: viewportBounds
         ,restitution: 0.99
-        ,cof: 0.8
+        ,cof: 0.5
     });
 
     // resize events
@@ -75,57 +75,57 @@ Physics(function (world) {
 
     }, true);
 
-    // create some bodies
     world.add( Physics.body('circle', {
-        x: renderer.width / 2
-        ,y: renderer.height / 2 - 240
-        ,vx: -0.15
-        ,mass: 5
+            x: renderer.width * 0.4
+            ,y: renderer.height * 0.32
+            ,vx: 0.3
+            ,radius: 10
+            ,styles: {
+                fillStyle: '#cb4b16'
+            }
+        }));
+
+    world.add( Physics.body('circle', {
+        x: renderer.width * 0.7
+        ,y: renderer.height * 0.3
+        ,vx: -0.3
         ,radius: 10
         ,styles: {
-            fillStyle: '#cb4b16'
-            ,angleIndicator: '#72240d'
-        }
-    }));
-
-    world.add( Physics.body('circle', {
-        x: renderer.width / 2
-        ,y: renderer.height / 2
-        ,radius: 30
-        ,mass: 20
-        ,vx: 0
-        ,vy: 0
-        ,styles: {
             fillStyle: '#6c71c4'
-            ,angleIndicator: '#3b3e6b'
         }
     }));
 
-    // add some fun interaction
-    var attractor = Physics.behavior('attractor', {
-        order: 0,
-        strength: .002
+    var hex_scale = renderer.height/4;
+    var hexagon = Physics.body('convex-polygon', {
+        // place the center of the square at (0, 0)
+        x: renderer.width * 0.5,
+        y: renderer.height * 0.5,
+        treatment: 'static',
+        vertices: [
+            { x: hex_scale*1.5, y: hex_scale*0.5 * Math.sqrt(3) },
+            { x: 0, y: hex_scale*1 * Math.sqrt(3) },
+            { x: hex_scale*-1.5, y: hex_scale*0.5 * Math.sqrt(3) },
+            { x: hex_scale*-1.5, y: hex_scale*-0.5 * Math.sqrt(3) },
+            { x: 0, y: hex_scale*-1 * Math.sqrt(3) },
+            { x: hex_scale*1.5, y: hex_scale*-0.5 * Math.sqrt(3) }
+        ]
     });
-    world.on({
-        'interact:poke': function( pos ){
-            world.wakeUpAll();
-            attractor.position( pos );
-            world.add( attractor );
-        }
-        ,'interact:move': function( pos ){
-            attractor.position( pos );
-        }
-        ,'interact:release': function(){
-            world.wakeUpAll();
-            world.remove( attractor );
-        }
+
+    world.add(hexagon);
+
+    // add some gravity
+    var gravity = Physics.behavior('constant-acceleration', {
+        acc: { x : 0, y: 0.0004 } // this is the default
     });
+    world.add( gravity );
+
 
     // add things to the world
     world.add([
         Physics.behavior('interactive', { el: renderer.container })
-        ,Physics.behavior('newtonian', { strength: .5 })
         ,Physics.behavior('body-impulse-response')
+        ,Physics.behavior('body-collision-detection')
+        ,Physics.behavior('sweep-prune')
         ,edgeBounce
     ]);
 
