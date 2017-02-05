@@ -8,6 +8,7 @@ function MidiHandler(Pizzicato) {
     var base = 440;
     var midiToFrequency = {};
 
+    // Send midi to be played
     this.receiveMidiNumber = function (midiNumber) {
         playMidiNote(midiNumber);
     };
@@ -17,10 +18,6 @@ function MidiHandler(Pizzicato) {
     }
 
     function playMidiNote(midiNumber) {
-        /**
-         * Theoretically is more efficient as it does not
-         * create a new sound every time this functin is called
-         */
         if (!midiToFrequency[midiNumber]) {
             midiToFrequency[midiNumber] = new Pizzicato.Sound({
                 source: 'wave',
