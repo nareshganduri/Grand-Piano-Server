@@ -40,11 +40,33 @@ function onMIDIMessage(message) {
 //
 Physics(function (world) {
 
+    // // bounds of the window
+    // var viewportBounds = Physics.aabb(0, 0, window.innerWidth, window.innerHeight)
+        
+    //     ,renderer
+    //     ;
+
     // bounds of the window
     var viewportBounds = Physics.aabb(0, 0, window.innerWidth, window.innerHeight)
-        ,edgeBounce
-        ,renderer
-        ;
+    ,width = window.innerWidth
+    ,height = window.innerHeight
+    ,edgeBounce
+    ,renderer
+    ;
+
+    // scale relative to window width
+    function S( n ){
+        return n * window.innerWidth / 600;
+    }
+
+    // some fun colors
+    var colors = {
+        blue: '0x1d6b98',
+        blueDark: '0x14546f',
+        red: '0xdc322f',
+        darkRed: '0xa42222',
+        white: '#ffffff'
+    };
 
     // create a renderer
     renderer = Physics.renderer('canvas', {
@@ -61,7 +83,7 @@ Physics(function (world) {
     // constrain objects to these bounds
     edgeBounce = Physics.behavior('edge-collision-detection', {
         aabb: viewportBounds
-        ,restitution: 0.99
+        ,restitution: 0.9
         ,cof: 0.5
     });
 
@@ -76,8 +98,8 @@ Physics(function (world) {
     }, true);
 
     world.add( Physics.body('circle', {
-            x: renderer.width * 0.4
-            ,y: renderer.height * 0.32
+            x: width/2
+            ,y: height/2
             ,vx: 0.3
             ,radius: 10
             ,styles: {
@@ -86,8 +108,8 @@ Physics(function (world) {
         }));
 
     world.add( Physics.body('circle', {
-        x: renderer.width * 0.7
-        ,y: renderer.height * 0.3
+        x: width/2
+        ,y: height/2
         ,vx: -0.3
         ,radius: 10
         ,styles: {
@@ -95,23 +117,117 @@ Physics(function (world) {
         }
     }));
 
-    var hex_scale = renderer.height/4;
-    var hexagon = Physics.body('convex-polygon', {
+    var hex_scale = renderer.height/6;
+    var hexagon_0 = Physics.body('convex-polygon', {
         // place the center of the square at (0, 0)
-        x: renderer.width * 0.5,
-        y: renderer.height * 0.5,
+        x: renderer.width * 0.4,
+        y: renderer.height * 0.6,
         treatment: 'static',
         vertices: [
-            { x: hex_scale*1.5, y: hex_scale*0.5 * Math.sqrt(3) },
-            { x: 0, y: hex_scale*1 * Math.sqrt(3) },
-            { x: hex_scale*-1.5, y: hex_scale*0.5 * Math.sqrt(3) },
-            { x: hex_scale*-1.5, y: hex_scale*-0.5 * Math.sqrt(3) },
-            { x: 0, y: hex_scale*-1 * Math.sqrt(3) },
-            { x: hex_scale*1.5, y: hex_scale*-0.5 * Math.sqrt(3) }
-        ]
+            { x: 1 + hex_scale*1.5, y: 1 + hex_scale*0.5 * Math.sqrt(3) },
+            { x: 1,                 y: 1 + hex_scale*1 * Math.sqrt(3) },
+            { x: 0,                 y: hex_scale*1 * Math.sqrt(3) },
+            { x: hex_scale*1.5,     y: hex_scale*0.5 * Math.sqrt(3) }
+        ],
+        styles: {
+            fillStyle: '#ffffff'
+        }
     });
 
-    world.add(hexagon);
+    // create the zero
+        var zero = Physics.body('compound', {
+            x: width/2
+            ,y: height/2
+            ,treatment: 'static'
+            ,styles: {
+                fillStyle: colors.white
+                ,lineWidth: 1
+                ,strokeStyle: colors.white
+
+            }
+            ,children: [
+            // coords of children are relative to the compound center of mass
+            Physics.body('rectangle', {     //left side
+                x: S(-50)
+                ,y: 0
+                ,width: S(5)
+                ,height: S(50)
+                ,mass: 20
+            })
+            ,Physics.body('rectangle', {    //right side
+                x: S(50)
+                ,y: 0
+                ,width: S(5)
+                ,height: S(50)
+                ,mass: 20
+            })
+            ,Physics.body('rectangle', {    //top
+                x: 0
+                ,y: S(50)
+                ,width: S(50)
+                ,height: S(5)
+                ,mass: 20
+            })
+            ,Physics.body('rectangle', {    //bottom left
+                x: -S(35)
+                ,y: S(38)
+                ,angle: Math.PI / 4
+                ,width: S(50)
+                ,height: S(5)
+                ,mass: 20
+            })
+            ,Physics.body('rectangle', {
+                x: S(35)
+                ,y: S(60)
+                ,angle: -Math.PI / 4
+                ,width: S(50)
+                ,height: S(5)
+                ,mass: 20
+            })
+            ,Physics.body('rectangle', {    // bottom
+                x: 0
+                ,y: S(-50)
+                ,width: S(50)
+                ,height: S(5)
+                ,mass: 20
+            })
+            ,Physics.body('rectangle', {
+                x: -S(35)
+                ,y: -S(60)
+                ,angle: -Math.PI / 4
+                ,width: S(50)
+                ,height: S(5)
+                ,mass: 20
+            })
+            ,Physics.body('rectangle', {
+                x: S(35)
+                ,y: -S(60)
+                ,angle: Math.PI / 4
+                ,width: S(50)
+                ,height: S(5)
+                ,mass: 20
+            })
+            ]
+        });
+
+
+    // var hexagon_0 = Physics.body('convex-polygon', {
+    //     // place the center of the square at (0, 0)
+    //     x: renderer.width * 0.5,
+    //     y: renderer.height * 0.5,
+    //     treatment: 'static',
+    //     vertices: [
+    //         { x: 1.5, y: 0.5 * Math.sqrt(3) },
+    //         { x: 0, y: 1 * Math.sqrt(3) },
+    //         { x: -1.5, y: 0.5 * Math.sqrt(3) },
+    //         { x: -1.5, y: -0.5 * Math.sqrt(3) },
+    //         { x: 0, y: -1 * Math.sqrt(3) },
+    //         { x: 1.5, y: -0.5 * Math.sqrt(3) }
+    //     ]
+    // });
+
+    // world.add(hexagon_0);
+    world.add(zero);
 
     // add some gravity
     var gravity = Physics.behavior('constant-acceleration', {
