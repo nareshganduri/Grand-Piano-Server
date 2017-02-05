@@ -22,7 +22,7 @@ function MidiHandler(Pizzicato) {
             midiToFrequency[midiNumber] = new Pizzicato.Sound({
                 source: 'wave',
                 options: {
-                    type: 'square',
+                    type: 'sin',
                     frequency: convertMidiToFrequency(midiNumber)}
             });
         }
