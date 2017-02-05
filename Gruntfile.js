@@ -18,6 +18,9 @@ module.exports = function(grunt) {
           'public/js/controllers.js': ['source_js/controllers.js'],
           'public/js/services.js': ['source_js/services.js'],
           'public/js/controls.js': ['source_js/controls.js'],
+          'public/js/inputHandler.js': ['source_js/inputHandler.js'],
+          'public/js/midiHandler.js': ['source_js/midiHandler.js'],
+          'public/js/pitchClassMapping.js': ['source_js/pitchClassMapping.js']
         } //files
       } //my_target
     }, //uglify

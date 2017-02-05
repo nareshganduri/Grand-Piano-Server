@@ -35,10 +35,11 @@ function onMIDIMessage(message) {
     data = message.data; // this gives us our [command/channel, note, velocity] data.
     console.log('MIDI data', data); // MIDI data [144, 63, 73]
 }
-//
 // Simple example of a newtonian orbit
 //
 Physics(function (world) {
+
+    var input = new InputHandler(Physics, Pizzicato, world);
 
     // // bounds of the window
     // var viewportBounds = Physics.aabb(0, 0, window.innerWidth, window.innerHeight)
