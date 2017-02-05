@@ -14,9 +14,9 @@ function InputHandler(Physics, Pizzicato, world) {
 
     getKeyboardInput();
 
-    function receiveInput(midiNumber) {
+    this.receiveInput = function(midiNumber) {
         midiHandler.receiveMidiNumber(midiNumber);
-    }
+    };
 
     function getKeyboardInput() {
         //defaultKey();

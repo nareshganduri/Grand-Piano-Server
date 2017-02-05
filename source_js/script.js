@@ -130,7 +130,8 @@ Physics(function (world) {
 
     }, true);
 
-    world.add( Physics.body('circle', {
+    var circles = [
+        Physics.body('circle', {
             x: width/2
             ,y: height/2
             ,vx: 0.3
@@ -138,17 +139,23 @@ Physics(function (world) {
             ,styles: {
                 fillStyle: '#cb4b16'
             }
-        }));
+        })
+        ,
+        Physics.body('circle', {
+            x: width/2
+            ,y: height/2
+            ,vx: -0.3
+            ,radius: 10
+            ,styles: {
+                fillStyle: '#6c71c4'
+            }
+        })
+    ];
 
-    world.add( Physics.body('circle', {
-        x: width/2
-        ,y: height/2
-        ,vx: -0.3
-        ,radius: 10
-        ,styles: {
-            fillStyle: '#6c71c4'
-        }
-    }));
+    circles.forEach(function(circle) {
+        circle.note = Math.floor(Math.random() * 20) + 40;
+        world.add(circle);
+    });
 
     var hex_scale = renderer.height/6;
     var hexagon_0 = Physics.body('convex-polygon', {
@@ -214,6 +221,20 @@ Physics(function (world) {
         ,Physics.behavior('sweep-prune')
         ,edgeBounce
     ]);
+
+    world.on('collisions:detected', function(data) {
+        var bodyA = data.collisions[0].bodyA;
+        var bodyB = data.collisions[0].bodyB;
+
+        if (bodyA.note)
+            input.receiveInput(bodyA.note);
+        if (bodyB.note)
+            input.receiveInput(bodyB.note);
+
+        console.log(data);
+
+    });
+
 
     // subscribe to ticker to advance the simulation
     Physics.util.ticker.on(function( time ) {
