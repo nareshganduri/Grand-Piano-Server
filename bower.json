@@ -15,6 +15,7 @@
     "jquery_lazyload": "jquery.lazyload#^1.9.7",
     "PhysicsJS": "physicsjs#^0.7.0",
     "angular-websocket": "^2.0.0",
-    "timbre.js": "timbre#^14.11.25"
+    "timbre.js": "timbre#^14.11.25",
+    "pizzicato": "0.4.0"
   }
 }
