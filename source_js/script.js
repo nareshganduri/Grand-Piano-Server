@@ -35,7 +35,7 @@ function onMIDIMessage(message) {
     data = message.data; // this gives us our [command/channel, note, velocity] data.
     console.log('MIDI data', data); // MIDI data [144, 63, 73]
 }
- //
+//
 // Simple example of a newtonian orbit
 //
 Physics(function (world) {
@@ -58,6 +58,38 @@ Physics(function (world) {
     function S( n ){
         return n * window.innerWidth / 600;
     }
+
+    // Plz give me a number > 3
+    function regularPolygon(N, r, width, mass) {
+        width || (width = 5);
+        mass || (mass = 20);
+
+        var angle = 2 * Math.PI / N;
+        var sideLength = 2 * r * Math.sin(angle / 2);
+        var sideDist = r * Math.cos(angle / 2);
+
+        var angles = [];
+        for (var i = 0; i < N; i++) {
+            angles.push(angle * i);
+        }
+
+        return angles.map(function(angle) {
+            var x = sideDist * Math.cos(angle);
+            var y = sideDist * Math.sin(angle);
+            var rotation = angle;
+
+            return Physics.body('rectangle', {    //right side
+                x: S(x)
+                ,y: S(y)
+                ,width: S(width)
+                ,height: S(sideLength + width / 2)
+                ,mass: mass
+                ,angle: rotation
+            })
+        })
+
+    }
+
 
     // some fun colors
     var colors = {
@@ -138,76 +170,14 @@ Physics(function (world) {
         var zero = Physics.body('compound', {
             x: width/2
             ,y: height/2
-            ,treatment: 'static'
+            ,treatment: 'kinematic'
             ,styles: {
                 fillStyle: colors.white
                 ,lineWidth: 1
                 ,strokeStyle: colors.white
 
             }
-            ,children: [
-            // coords of children are relative to the compound center of mass
-            Physics.body('rectangle', {     //left side
-                x: S(-50)
-                ,y: 0
-                ,width: S(5)
-                ,height: S(50)
-                ,mass: 20
-            })
-            ,Physics.body('rectangle', {    //right side
-                x: S(50)
-                ,y: 0
-                ,width: S(5)
-                ,height: S(50)
-                ,mass: 20
-            })
-            ,Physics.body('rectangle', {    //top
-                x: 0
-                ,y: S(50)
-                ,width: S(50)
-                ,height: S(5)
-                ,mass: 20
-            })
-            ,Physics.body('rectangle', {    //bottom left
-                x: -S(35)
-                ,y: S(38)
-                ,angle: Math.PI / 4
-                ,width: S(50)
-                ,height: S(5)
-                ,mass: 20
-            })
-            ,Physics.body('rectangle', {
-                x: S(35)
-                ,y: S(60)
-                ,angle: -Math.PI / 4
-                ,width: S(50)
-                ,height: S(5)
-                ,mass: 20
-            })
-            ,Physics.body('rectangle', {    // bottom
-                x: 0
-                ,y: S(-50)
-                ,width: S(50)
-                ,height: S(5)
-                ,mass: 20
-            })
-            ,Physics.body('rectangle', {
-                x: -S(35)
-                ,y: -S(60)
-                ,angle: -Math.PI / 4
-                ,width: S(50)
-                ,height: S(5)
-                ,mass: 20
-            })
-            ,Physics.body('rectangle', {
-                x: S(35)
-                ,y: -S(60)
-                ,angle: Math.PI / 4
-                ,width: S(50)
-                ,height: S(5)
-                ,mass: 20
-            })
-            ]
+            ,children: regularPolygon(3, 100)
         });
 
 
@@ -235,7 +205,6 @@ Physics(function (world) {
     });
     world.add( gravity );
 
-
     // add things to the world
     world.add([
         Physics.behavior('interactive', { el: renderer.container })
@@ -248,5 +217,6 @@ Physics(function (world) {
     // subscribe to ticker to advance the simulation
     Physics.util.ticker.on(function( time ) {
         world.step( time );
+        zero.state.angular.vel = 0.001;
     });
 });
