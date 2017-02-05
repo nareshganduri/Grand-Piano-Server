@@ -16,6 +16,9 @@
     "PhysicsJS": "physicsjs#^0.7.0",
     "angular-websocket": "^2.0.0",
     "timbre.js": "timbre#^14.11.25",
+    "pizzicato": "^0.5.1"
+  },
+  "resolutions": {
     "pizzicato": "0.4.0"
   }
 }
