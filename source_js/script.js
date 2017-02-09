@@ -41,12 +41,6 @@ Physics(function (world) {
 
     var input = new InputHandler(Physics, Pizzicato, world);
 
-    // // bounds of the window
-    // var viewportBounds = Physics.aabb(0, 0, window.innerWidth, window.innerHeight)
-        
-    //     ,renderer
-    //     ;
-
     // bounds of the window
     var viewportBounds = Physics.aabb(0, 0, window.innerWidth, window.innerHeight)
     ,width = window.innerWidth
@@ -157,54 +151,21 @@ Physics(function (world) {
         world.add(circle);
     });
 
-    var hex_scale = renderer.height/6;
-    var hexagon_0 = Physics.body('convex-polygon', {
-        // place the center of the square at (0, 0)
-        x: renderer.width * 0.4,
-        y: renderer.height * 0.6,
-        treatment: 'static',
-        vertices: [
-            { x: 1 + hex_scale*1.5, y: 1 + hex_scale*0.5 * Math.sqrt(3) },
-            { x: 1,                 y: 1 + hex_scale*1 * Math.sqrt(3) },
-            { x: 0,                 y: hex_scale*1 * Math.sqrt(3) },
-            { x: hex_scale*1.5,     y: hex_scale*0.5 * Math.sqrt(3) }
-        ],
-        styles: {
-            fillStyle: '#ffffff'
+    // create the zero, spinning regular polygon
+    var zero = Physics.body('compound', {
+        x: width/2
+        ,y: height/2
+        ,treatment: 'kinematic'
+        ,styles: {
+            fillStyle: colors.white
+            ,lineWidth: 1
+            ,strokeStyle: colors.white
+
         }
+        ,children: regularPolygon(3, 100)
     });
 
-    // create the zero
-        var zero = Physics.body('compound', {
-            x: width/2
-            ,y: height/2
-            ,treatment: 'kinematic'
-            ,styles: {
-                fillStyle: colors.white
-                ,lineWidth: 1
-                ,strokeStyle: colors.white
 
-            }
-            ,children: regularPolygon(3, 100)
-        });
-
-
-    // var hexagon_0 = Physics.body('convex-polygon', {
-    //     // place the center of the square at (0, 0)
-    //     x: renderer.width * 0.5,
-    //     y: renderer.height * 0.5,
-    //     treatment: 'static',
-    //     vertices: [
-    //         { x: 1.5, y: 0.5 * Math.sqrt(3) },
-    //         { x: 0, y: 1 * Math.sqrt(3) },
-    //         { x: -1.5, y: 0.5 * Math.sqrt(3) },
-    //         { x: -1.5, y: -0.5 * Math.sqrt(3) },
-    //         { x: 0, y: -1 * Math.sqrt(3) },
-    //         { x: 1.5, y: -0.5 * Math.sqrt(3) }
-    //     ]
-    // });
-
-    // world.add(hexagon_0);
     world.add(zero);
 
     // add some gravity
@@ -231,7 +192,7 @@ Physics(function (world) {
         if (bodyB.note)
             input.receiveInput(bodyB.note);
 
-        console.log(data);
+        // console.log(data);
 
     });
 
