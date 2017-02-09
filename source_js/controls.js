@@ -1,13 +1,55 @@
+document.onkeydown = checkKey;
+function checkKey(e) {
 
-var map = []
+    e = e || window.event;
+    console.log(e);
+    if (e.keyCode == 187) { // = key
+        // add a side
+        num_sides += 1;
+        world.remove(zero);
+        zero = Physics.body('compound', {
+                x: width/2
+                ,y: height/2
+                ,treatment: 'kinematic'
+                ,styles: {
+                    fillStyle: colors.white
+                    ,lineWidth: 1
+                    ,strokeStyle: colors.white
 
+                }
+                ,children: regularPolygon(num_sides, 100)
+            });
 
-var BASE = 60;
+        world.add(zero);
+    }
+    else if (e.keyCode == 189) { // - key
+        // remove a side
+        if ( num_sides > 3 ) {
+            num_sides -= 1;
+            world.remove(zero);
+            zero = Physics.body('compound', {
+                    x: width/2
+                    ,y: height/2
+                    ,treatment: 'kinematic'
+                    ,styles: {
+                        fillStyle: colors.white
+                        ,lineWidth: 1
+                        ,strokeStyle: colors.white
 
-for (var i = 0; i < 256; i++) {
-    map[i] = {pressed: false, held_length: 0};
-}
+                    }
+                    ,children: regularPolygon(num_sides, 100)
+                });
 
-function spawnNote(world, note) {
-    
+            world.add(zero);
+        }
+    }
+    else if (e.keyCode == 219) { // [ key
+        // decrease rotation
+        zero_ang_vel -= 0.0001;
+    }
+    else if (e.keyCode == 221) { // ] key
+        // increase rotation
+        zero_ang_vel += 0.0001;
+    }
+
 }
