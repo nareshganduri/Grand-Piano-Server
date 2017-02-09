@@ -35,18 +35,12 @@ function onMIDIMessage(message) {
     data = message.data; // this gives us our [command/channel, note, velocity] data.
     console.log('MIDI data', data); // MIDI data [144, 63, 73]
 }
-// Simple example of a newtonian orbit
-//
+
+// global variables
+var zero_ang_vel = 0.001;
+var num_sides = 3;
+
 Physics(function (world) {
-
-    var input = new InputHandler(Physics, Pizzicato, world);
-
-    // // bounds of the window
-    // var viewportBounds = Physics.aabb(0, 0, window.innerWidth, window.innerHeight)
-        
-    //     ,renderer
-    //     ;
-
     // bounds of the window
     var viewportBounds = Physics.aabb(0, 0, window.innerWidth, window.innerHeight)
     ,width = window.innerWidth
@@ -55,13 +49,8 @@ Physics(function (world) {
     ,renderer
     ;
 
-    // scale relative to window width
-    function S( n ){
-        return n * window.innerWidth / 600;
-    }
-
     // Plz give me a number > 3
-    function regularPolygon(N, r, width, mass) {
+    var regularPolygon = function (N, r, width, mass) {
         width || (width = 5);
         mass || (mass = 20);
 
@@ -91,6 +80,12 @@ Physics(function (world) {
 
     }
 
+    // scale relative to window width
+    function S( n ){
+        return n * window.innerWidth / 600;
+    }
+
+    var input = new InputHandler(Physics, Pizzicato, world, regularPolygon, width, height);
 
     // some fun colors
     var colors = {
@@ -135,7 +130,7 @@ Physics(function (world) {
             x: width/2
             ,y: height/2
             ,vx: 0.3
-            ,radius: 10
+            ,radius: 5
             ,styles: {
                 fillStyle: '#cb4b16'
             }
@@ -145,7 +140,7 @@ Physics(function (world) {
             x: width/2
             ,y: height/2
             ,vx: -0.3
-            ,radius: 10
+            ,radius: 5
             ,styles: {
                 fillStyle: '#6c71c4'
             }
@@ -153,58 +148,26 @@ Physics(function (world) {
     ];
 
     circles.forEach(function(circle) {
-        circle.note = Math.floor(Math.random() * 20) + 40;
+        var major_notes = [0, 2, 4, 5, 7, 9, 11]
+        // circle.note = Math.floor(Math.random() * 20) + 40;
+        circle.note = major_notes[Math.floor(Math.random() * major_notes.length)]+60
         world.add(circle);
     });
 
-    var hex_scale = renderer.height/6;
-    var hexagon_0 = Physics.body('convex-polygon', {
-        // place the center of the square at (0, 0)
-        x: renderer.width * 0.4,
-        y: renderer.height * 0.6,
-        treatment: 'static',
-        vertices: [
-            { x: 1 + hex_scale*1.5, y: 1 + hex_scale*0.5 * Math.sqrt(3) },
-            { x: 1,                 y: 1 + hex_scale*1 * Math.sqrt(3) },
-            { x: 0,                 y: hex_scale*1 * Math.sqrt(3) },
-            { x: hex_scale*1.5,     y: hex_scale*0.5 * Math.sqrt(3) }
-        ],
-        styles: {
-            fillStyle: '#ffffff'
+    // create the zero, spinning regular polygon
+    var zero = Physics.body('compound', {
+        x: width/2
+        ,y: height/2
+        ,treatment: 'kinematic'
+        ,styles: {
+            fillStyle: colors.white
+            ,lineWidth: 1
+            ,strokeStyle: colors.white
+
         }
+        ,children: regularPolygon(3, 100)
     });
 
-    // create the zero
-        var zero = Physics.body('compound', {
-            x: width/2
-            ,y: height/2
-            ,treatment: 'kinematic'
-            ,styles: {
-                fillStyle: colors.white
-                ,lineWidth: 1
-                ,strokeStyle: colors.white
-
-            }
-            ,children: regularPolygon(3, 100)
-        });
-
-
-    // var hexagon_0 = Physics.body('convex-polygon', {
-    //     // place the center of the square at (0, 0)
-    //     x: renderer.width * 0.5,
-    //     y: renderer.height * 0.5,
-    //     treatment: 'static',
-    //     vertices: [
-    //         { x: 1.5, y: 0.5 * Math.sqrt(3) },
-    //         { x: 0, y: 1 * Math.sqrt(3) },
-    //         { x: -1.5, y: 0.5 * Math.sqrt(3) },
-    //         { x: -1.5, y: -0.5 * Math.sqrt(3) },
-    //         { x: 0, y: -1 * Math.sqrt(3) },
-    //         { x: 1.5, y: -0.5 * Math.sqrt(3) }
-    //     ]
-    // });
-
-    // world.add(hexagon_0);
     world.add(zero);
 
     // add some gravity
@@ -231,7 +194,7 @@ Physics(function (world) {
         if (bodyB.note)
             input.receiveInput(bodyB.note);
 
-        console.log(data);
+        // console.log(data);
 
     });
 
@@ -239,6 +202,6 @@ Physics(function (world) {
     // subscribe to ticker to advance the simulation
     Physics.util.ticker.on(function( time ) {
         world.step( time );
-        zero.state.angular.vel = 0.001;
+        world.findOne({'treatment':'kinematic'}).state.angular.vel = zero_ang_vel;
     });
 });

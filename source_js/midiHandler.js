@@ -22,7 +22,7 @@ function MidiHandler(Pizzicato) {
             midiToFrequency[midiNumber] = new Pizzicato.Sound({
                 source: 'wave',
                 options: {
-                    type: 'sin',
+                    type: 'sawtooth',
                     frequency: convertMidiToFrequency(midiNumber)}
             });
         }
@@ -39,7 +39,7 @@ function MidiHandler(Pizzicato) {
             midiToFrequency[midiNumber] = new Pizzicato.Sound({
                 source: 'wave',
                 options: {
-                    type: 'square',
+                    type: 'sawtooth',
                     frequency: convertMidiToFrequency(midiNumber),
                     volume: 0.1}
 
