@@ -6,7 +6,7 @@
 
 /* global PitchClassMapping */
 
-function InputHandler(Physics, Pizzicato, world) {
+function InputHandler(Physics, Pizzicato, world, regularPolygon, width, height) {
     var baseOctave = 60;
     var heldNotes = [];
 
@@ -19,8 +19,8 @@ function InputHandler(Physics, Pizzicato, world) {
     };
 
     function getKeyboardInput() {
-        //defaultKey();
-        sustain();
+        defaultKey();
+        // sustain();
     }
 
     function sustain() {
@@ -59,12 +59,63 @@ function InputHandler(Physics, Pizzicato, world) {
 
     function defaultKey() {
         window.onkeyup = function (e) {
+            var zero = world.findOne({'treatment':'kinematic'});
             var keyPressed = String.fromCharCode(e.keyCode).toLowerCase();
             if (keyPressed in PitchClassMapping.keyboardCharToPitchClass) {
                 var midiNumber = baseOctave + parseInt(PitchClassMapping.keyboardCharToPitchClass[keyPressed]);
 
                 receiveInput(midiNumber);
             }
+
+            else if (e.keyCode == 187) { // = key
+                // add a side
+                num_sides += 1;
+                world.remove(zero);
+                zero = Physics.body('compound', {
+                        x: width/2
+                        ,y: height/2
+                        ,treatment: 'kinematic'
+                        ,styles: {
+                            fillStyle: '#ffffff'
+                            ,lineWidth: 1
+                            ,strokeStyle: '#ffffff'
+
+                        }
+                        ,children: regularPolygon(num_sides, 100)
+                    });
+
+                world.add(zero);
+            }
+            else if (e.keyCode == 189) { // - key
+                // remove a side
+                if ( num_sides > 3 ) {
+                    num_sides -= 1;
+                    world.remove(zero);
+                    zero = Physics.body('compound', {
+                            x: width/2
+                            ,y: height/2
+                            ,treatment: 'kinematic'
+                            ,styles: {
+                                fillStyle: '#ffffff'
+                                ,lineWidth: 1
+                                ,strokeStyle: '#ffffff'
+
+                            }
+                            ,children: regularPolygon(num_sides, 100)
+                        });
+
+                    world.add(zero);
+                }
+            }
+            else if (e.keyCode == 219) { // [ key
+                // decrease rotation
+                zero_ang_vel -= 0.00015;
+            }
+            else if (e.keyCode == 221) { // ] key
+                // increase rotation
+                zero_ang_vel += 0.00015;
+            }
+
 
             rapidFire(keyPressed);
         };
