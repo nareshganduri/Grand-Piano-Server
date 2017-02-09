@@ -49,8 +49,10 @@ Physics(function (world) {
     ,renderer
     ;
 
+
     // Plz give me a number > 3
     var regularPolygon = function (N, r, width, mass) {
+
         width || (width = 5);
         mass || (mass = 20);
 
@@ -77,7 +79,20 @@ Physics(function (world) {
                 ,angle: rotation
             })
         })
+    }
 
+    function spawnCircle(x, y, r, color, note) {
+        var circle = Physics.body('circle', {
+            x: x
+            ,y: y
+            ,mass: 1
+            ,radius: r
+            ,styles: {
+                fillStyle: color
+            }
+        });
+        circle.note = note;
+        world.add(circle);
     }
 
     // scale relative to window width
@@ -86,6 +101,18 @@ Physics(function (world) {
     }
 
     var input = new InputHandler(Physics, Pizzicato, world, regularPolygon, width, height);
+    input.addKeyBinding('a', function() {spawnCircle(width/2, height/2, 10, '#ffffff', 60)});
+    input.addKeyBinding('w', function() {spawnCircle(width/2, height/2, 10, '#ffffff', 61)});
+    input.addKeyBinding('s', function() {spawnCircle(width/2, height/2, 10, '#ffffff', 62)});
+    input.addKeyBinding('e', function() {spawnCircle(width/2, height/2, 10, '#ffffff', 63)});
+    input.addKeyBinding('d', function() {spawnCircle(width/2, height/2, 10, '#ffffff', 64)});
+    input.addKeyBinding('f', function() {spawnCircle(width/2, height/2, 10, '#ffffff', 65)});
+    input.addKeyBinding('t', function() {spawnCircle(width/2, height/2, 10, '#ffffff', 66)});
+    input.addKeyBinding('g', function() {spawnCircle(width/2, height/2, 10, '#ffffff', 67)});
+    input.addKeyBinding('y', function() {spawnCircle(width/2, height/2, 10, '#ffffff', 68)});
+    input.addKeyBinding('h', function() {spawnCircle(width/2, height/2, 10, '#ffffff', 69)});
+    input.addKeyBinding('u', function() {spawnCircle(width/2, height/2, 10, '#ffffff', 70)});
+    input.addKeyBinding('j', function() {spawnCircle(width/2, height/2, 10, '#ffffff', 71)});
 
     // some fun colors
     var colors = {
@@ -193,9 +220,6 @@ Physics(function (world) {
             input.receiveInput(bodyA.note);
         if (bodyB.note)
             input.receiveInput(bodyB.note);
-
-        // console.log(data);
-
     });
 
 
