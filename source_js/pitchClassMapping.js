@@ -8,6 +8,17 @@ function PitchClassMapping() {
 
 }
 
+function mapPitch(noteName, color, func) {
+    return {
+        "Note": noteName,
+        "Color": color,
+        "Function": func
+    }
+}
+
+pitchClassMapping.pitchMapping = {
+    0: mapPitch("C", "FF0000" )
+
 PitchClassMapping.pitchClassToNoteName = {
     0: "C",
     1: "C#",
