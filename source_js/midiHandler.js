@@ -43,12 +43,12 @@ function MidiHandler(Pizzicato) {
                     frequency: convertMidiToFrequency(midiNumber)}
             });
         }
-
-        try { // try to use piano sounds
-            var sound = piano_sound_files[midiNumber];
+        var sound;
+        if (midiNumber >= 60 && midiNumber <= 72) { // try to use piano sounds
+            sound = piano_sound_files[midiNumber];
         }
-        catch(e) {
-            var sound = midiToFrequency[midiNumber];
+        else {
+            sound = midiToFrequency[midiNumber];
         }
         sound.play();
         setTimeout(function () {
