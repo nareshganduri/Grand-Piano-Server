@@ -1,3 +1,5 @@
+/* global PitchClassMapping */
+
 $(document).ready(function(){
     var ws = new WebSocket('ws://localhost:1234', 'echo-protocol');
 });
@@ -101,27 +103,6 @@ Physics(function (world) {
     }
 
     var input = new InputHandler(Physics, Pizzicato, world, regularPolygon, width, height);
-    input.addKeyBinding('a', function() {spawnCircle(width/2, height/2, 10, '#ffffff', 60)});
-    input.addKeyBinding('w', function() {spawnCircle(width/2, height/2, 10, '#ffffff', 61)});
-    input.addKeyBinding('s', function() {spawnCircle(width/2, height/2, 10, '#ffffff', 62)});
-    input.addKeyBinding('e', function() {spawnCircle(width/2, height/2, 10, '#ffffff', 63)});
-    input.addKeyBinding('d', function() {spawnCircle(width/2, height/2, 10, '#ffffff', 64)});
-    input.addKeyBinding('f', function() {spawnCircle(width/2, height/2, 10, '#ffffff', 65)});
-    input.addKeyBinding('t', function() {spawnCircle(width/2, height/2, 10, '#ffffff', 66)});
-    input.addKeyBinding('g', function() {spawnCircle(width/2, height/2, 10, '#ffffff', 67)});
-    input.addKeyBinding('y', function() {spawnCircle(width/2, height/2, 10, '#ffffff', 68)});
-    input.addKeyBinding('h', function() {spawnCircle(width/2, height/2, 10, '#ffffff', 69)});
-    input.addKeyBinding('u', function() {spawnCircle(width/2, height/2, 10, '#ffffff', 70)});
-    input.addKeyBinding('j', function() {spawnCircle(width/2, height/2, 10, '#ffffff', 71)});
-
-    // some fun colors
-    var colors = {
-        blue: '0x1d6b98',
-        blueDark: '0x14546f',
-        red: '0xdc322f',
-        darkRed: '0xa42222',
-        white: '#ffffff'
-    };
 
     // create a renderer
     renderer = Physics.renderer('canvas', {
@@ -152,44 +133,15 @@ Physics(function (world) {
 
     }, true);
 
-    var circles = [
-        Physics.body('circle', {
-            x: width/2
-            ,y: height/2
-            ,vx: 0.3
-            ,radius: 5
-            ,styles: {
-                fillStyle: '#cb4b16'
-            }
-        })
-        ,
-        Physics.body('circle', {
-            x: width/2
-            ,y: height/2
-            ,vx: -0.3
-            ,radius: 5
-            ,styles: {
-                fillStyle: '#6c71c4'
-            }
-        })
-    ];
-
-    circles.forEach(function(circle) {
-        var major_notes = [0, 2, 4, 5, 7, 9, 11]
-        // circle.note = Math.floor(Math.random() * 20) + 40;
-        circle.note = major_notes[Math.floor(Math.random() * major_notes.length)]+60
-        world.add(circle);
-    });
-
     // create the zero, spinning regular polygon
     var zero = Physics.body('compound', {
         x: width/2
         ,y: height/2
         ,treatment: 'kinematic'
         ,styles: {
-            fillStyle: colors.white
+            fillStyle: '#ffffff'
             ,lineWidth: 1
-            ,strokeStyle: colors.white
+            ,strokeStyle: '#ffffff'
 
         }
         ,children: regularPolygon(3, 100)
