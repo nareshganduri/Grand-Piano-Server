@@ -7,16 +7,21 @@
 /* global PitchClassMapping */
 
 function InputHandler(Physics, Pizzicato, world, regularPolygon, width, height) {
+
     var baseOctave = 60;
     var heldNotes = [];
+
+    var that = this;
 
     var midiHandler = new MidiHandler(Pizzicato);
 
     getKeyboardInput();
 
-    this.receiveInput = function(midiNumber) {
+    function receiveInput(midiNumber) {
         midiHandler.receiveMidiNumber(midiNumber);
-    };
+    }
+
+    this.receiveInput = receiveInput;
 
     function getKeyboardInput() {
         defaultKey();
@@ -27,6 +32,7 @@ function InputHandler(Physics, Pizzicato, world, regularPolygon, width, height) 
         window.onkeydown = function (e) {
             var keyPressed = String.fromCharCode(e.keyCode).toLowerCase();
             rapidFire(keyPressed);
+
             if (keyPressed in PitchClassMapping.keyboardCharToPitchClass) {
                 var midiNumber = baseOctave + parseInt(PitchClassMapping.keyboardCharToPitchClass[keyPressed]);
 
@@ -59,8 +65,15 @@ function InputHandler(Physics, Pizzicato, world, regularPolygon, width, height) 
 
     function defaultKey() {
         window.onkeyup = function (e) {
+
+            console.log(e.key);
             var zero = world.findOne({'treatment':'kinematic'});
             var keyPressed = String.fromCharCode(e.keyCode).toLowerCase();
+
+            if (that.keyBindings[e.key]) {
+                that.keyBindings[e.key].forEach(function(f) {f()});
+            }
+
             if (keyPressed in PitchClassMapping.keyboardCharToPitchClass) {
                 var midiNumber = baseOctave + parseInt(PitchClassMapping.keyboardCharToPitchClass[keyPressed]);
 
@@ -128,6 +141,14 @@ function InputHandler(Physics, Pizzicato, world, regularPolygon, width, height) 
             receiveInput(rand);
         }
     }
+
+    this.keyBindings = {};
+
+    this.addKeyBinding = function(key, callback) {
+        if (this.keyBindings[key]) {
+            this.keyBindings[key].push(callback);
+        }
+        else
+            this.keyBindings[key] = [callback];
+    };
 }
-
-
