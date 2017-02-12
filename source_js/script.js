@@ -2,54 +2,75 @@ $(document).ready(function(){
     var ws = new WebSocket('ws://localhost:1234', 'echo-protocol');
 });
 
-// request MIDI access
-if (navigator.requestMIDIAccess) {
-    navigator.requestMIDIAccess({
-        sysex: false // this defaults to 'false' and we won't be covering sysex in this article. 
-    }).then(onMIDISuccess, onMIDIFailure);
-} else {
-    alert("No MIDI support in your browser.");
-}
-
-// midi functions
-function onMIDISuccess(midiAccess) {
-    // when we get a succesful response, run this code
-    console.log('MIDI Access Object', midiAccess);
-    // when we get a succesful response, run this code
-     midi = midiAccess; // this is our raw MIDI data, inputs, outputs, and sysex status
-
-     var inputs = midi.inputs.values();
-     // loop over all available inputs and listen for any MIDI input
-     for (var input = inputs.next(); input && !input.done; input = inputs.next()) {
-         // each time there is a midi message call the onMIDIMessage function
-         input.value.onmidimessage = onMIDIMessage;
-     }
-}
-
-function onMIDIFailure(e) {
-    // when we get a failed response, run this code
-    console.log("No access to MIDI devices or your browser doesn't support WebMIDI API. Please use WebMIDIAPIShim " + e);
-}
-
-function onMIDIMessage(message) {
-    data = message.data; // this gives us our [command/channel, note, velocity] data.
-    console.log('MIDI data', data); // MIDI data [144, 63, 73]
-}
-
 // global variables
 var zero_ang_vel = 0.001;
 var num_sides = 3;
+var width = window.innerWidth
+    ,height = window.innerHeight;
 
-Physics(function (world) {
+var physicsEngine = Physics(function (world) {
     // bounds of the window
     var viewportBounds = Physics.aabb(0, 0, window.innerWidth, window.innerHeight)
-    ,width = window.innerWidth
-    ,height = window.innerHeight
     ,edgeBounce
     ,renderer
     ;
 
+    /////////////////////////////////////////////MIDI PROCESSING///////////////////////////////////////////
+    // request MIDI access
+    if (navigator.requestMIDIAccess) {
+        navigator.requestMIDIAccess({
+            sysex: false // this defaults to 'false' and we won't be covering sysex in this article. 
+        }).then(onMIDISuccess, onMIDIFailure);
+    } else {
+        alert("No MIDI support in your browser.");
+    }
 
+    // midi functions
+    function onMIDISuccess(midiAccess) {
+        // when we get a succesful response, run this code
+        console.log('MIDI Access Object', midiAccess);
+        // when we get a succesful response, run this code
+         midi = midiAccess; // this is our raw MIDI data, inputs, outputs, and sysex status
+
+         var inputs = midi.inputs.values();
+         // loop over all available inputs and listen for any MIDI input
+         for (var input = inputs.next(); input && !input.done; input = inputs.next()) {
+             // each time there is a midi message call the onMIDIMessage function
+             input.value.onmidimessage = onMIDIMessage;
+         }
+    }
+
+    function onMIDIFailure(e) {
+        // when we get a failed response, run this code
+        console.log("No access to MIDI devices or your browser doesn't support WebMIDI API. Please use WebMIDIAPIShim " + e);
+    }
+
+    function onMIDIMessage(message) {
+        data = message.data; // this gives us our [command/channel, note, velocity] data.
+        console.log(data);
+        var channel = data[0] & 0xf;
+        var type = data[0] & 0xf0;
+        console.log('channel:' + channel);
+        console.log('type:' + type);
+        var note = data[1];
+        var velocity = data[2];
+        if (velocity > 0) {
+            switch(type) {
+                case 144: //noteon
+                    console.log('note on');
+                    spawnCircle(width/2, height/2, 10, '#ffffff', data[1]);
+                    break;
+                case 128:
+                    console.log('note off');
+                    break
+                default:
+                    break
+            }    
+        }
+    }
+
+
+    ///////////////////////////////////////////////////PHYSICS////////////////////////////////////////////////////////////
     // Plz give me a number > 3
     var regularPolygon = function (N, r, width, mass) {
 
@@ -81,7 +102,8 @@ Physics(function (world) {
         })
     }
 
-    function spawnCircle(x, y, r, color, note) {
+    var spawnCircle = function (x, y, r, color, note) {
+        console.log(note);
         var circle = Physics.body('circle', {
             x: x
             ,y: y
@@ -153,25 +175,25 @@ Physics(function (world) {
     }, true);
 
     var circles = [
-        Physics.body('circle', {
-            x: width/2
-            ,y: height/2
-            ,vx: 0.3
-            ,radius: 5
-            ,styles: {
-                fillStyle: '#cb4b16'
-            }
-        })
-        ,
-        Physics.body('circle', {
-            x: width/2
-            ,y: height/2
-            ,vx: -0.3
-            ,radius: 5
-            ,styles: {
-                fillStyle: '#6c71c4'
-            }
-        })
+        // Physics.body('circle', {
+        //     x: width/2
+        //     ,y: height/2
+        //     ,vx: 0.3
+        //     ,radius: 5
+        //     ,styles: {
+        //         fillStyle: '#cb4b16'
+        //     }
+        // })
+        // ,
+        // Physics.body('circle', {
+        //     x: width/2
+        //     ,y: height/2
+        //     ,vx: -0.3
+        //     ,radius: 5
+        //     ,styles: {
+        //         fillStyle: '#6c71c4'
+        //     }
+        // })
     ];
 
     circles.forEach(function(circle) {
