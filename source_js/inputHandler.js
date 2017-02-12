@@ -66,6 +66,7 @@ function InputHandler(Physics, Pizzicato, world, regularPolygon, width, height) 
         window.onkeyup = function (e) {
 
             var zero = world.findOne({ 'treatment': 'kinematic' });
+
             var keyPressed = String.fromCharCode(e.keyCode).toLowerCase();
 
             /* if (that.keyBindings[e.key]) {
