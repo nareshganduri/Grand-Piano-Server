@@ -83,9 +83,11 @@ function InputHandler(Physics, Pizzicato, world, regularPolygon, width, height) 
                     , radius: 10
                     , styles: {
                         fillStyle: map["color"]
+                        ,opacity: 1
                     }
                 });
                 circle.note = midiNumber;
+                circle.life = BALL_LIFE;
                 world.add(circle);
                 //receiveInput(midiNumber);
             }

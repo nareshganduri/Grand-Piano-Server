@@ -44,7 +44,7 @@ function MidiHandler(Pizzicato) {
             });
         }
         var sound;
-        if (midiNumber >= 60 && midiNumber <= 72) { // try to use piano sounds
+        if (midiNumber >= 60 && midiNumber <= 72) { // try to use piano sounds for the octave we are using
             sound = piano_sound_files[midiNumber];
         }
         else {
@@ -53,7 +53,7 @@ function MidiHandler(Pizzicato) {
         sound.play();
         setTimeout(function () {
             sound.stop();
-        }, 250);
+        }, 200);
     }
 
     this.play = function (midiNumber) {
