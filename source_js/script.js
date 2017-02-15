@@ -9,6 +9,7 @@ var zero_ang_vel = 0.001;
 var num_sides = 3;
 var width = window.innerWidth
     ,height = window.innerHeight;
+var BALL_LIFE = 10;
 
 var physicsEngine = Physics(function (world) {
     // bounds of the window
@@ -76,7 +77,7 @@ var physicsEngine = Physics(function (world) {
     // Plz give me a number > 3
     var regularPolygon = function (N, r, width, mass) {
 
-        width || (width = 5);
+        width || (width = 2.5);
         mass || (mass = 20);
 
         var angle = 2 * Math.PI / N;
@@ -116,6 +117,7 @@ var physicsEngine = Physics(function (world) {
             }
         });
         circle.note = note;
+        circle.life = BALL_LIFE;
         world.add(circle);
     }
 
@@ -139,11 +141,11 @@ var physicsEngine = Physics(function (world) {
     });
 
     // constrain objects to these bounds
-    edgeBounce = Physics.behavior('edge-collision-detection', {
-        aabb: viewportBounds
-        ,restitution: 0.9
-        ,cof: 0.5
-    });
+    // edgeBounce = Physics.behavior('edge-collision-detection', {
+    //     aabb: viewportBounds
+    //     ,restitution: 0.9
+    //     ,cof: 0.5
+    // });
 
     // resize events
     window.addEventListener('resize', function () {
@@ -151,7 +153,7 @@ var physicsEngine = Physics(function (world) {
         // as of 0.7.0 the renderer will auto resize... so we just take the values from the renderer
         viewportBounds = Physics.aabb(0, 0, renderer.width, renderer.height);
         // update the boundaries
-        edgeBounce.setAABB(viewportBounds);
+        // edgeBounce.setAABB(viewportBounds);
 
     }, true);
 
@@ -166,8 +168,9 @@ var physicsEngine = Physics(function (world) {
             ,strokeStyle: '#ffffff'
 
         }
-        ,children: regularPolygon(3, 100)
+        ,children: regularPolygon(6, 100)
     });
+    console.log(zero);
 
     world.add(zero);
 
@@ -190,10 +193,30 @@ var physicsEngine = Physics(function (world) {
         var bodyA = data.collisions[0].bodyA;
         var bodyB = data.collisions[0].bodyB;
 
-        if (bodyA.note)
+        if (bodyA.note) {
             input.receiveInput(bodyA.note);
-        if (bodyB.note)
+            bodyA.life--;
+            bodyA.styles.fillStyle = shadeBlendConvert(-(1.5/BALL_LIFE), bodyA.styles.fillStyle);
+            bodyA.view = null;
+            bodyA.recalc();
+
+            if (bodyA.life <= 0) {
+                world.remove(bodyA);
+            }            
+        }
+        if (bodyB.note) {
             input.receiveInput(bodyB.note);
+            bodyB.life--;
+            bodyB.styles.fillStyle = shadeBlendConvert(-(1.5/BALL_LIFE), bodyB.styles.fillStyle);
+            bodyB.view = null;
+            bodyB.recalc();
+
+            if (bodyB.life <= 0) {
+                world.remove(bodyB);
+            }            
+        }
+
+        
     });
 
 
