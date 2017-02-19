@@ -1,6 +1,6 @@
 /* global PitchClassMapping */
 
-$(document).ready(function(){
+$(document).ready(function () {
     var ws = new WebSocket('ws://localhost:1234', 'echo-protocol');
 });
 
@@ -18,14 +18,14 @@ function onMIDISuccess(midiAccess) {
     // when we get a succesful response, run this code
     console.log('MIDI Access Object', midiAccess);
     // when we get a succesful response, run this code
-     midi = midiAccess; // this is our raw MIDI data, inputs, outputs, and sysex status
+    midi = midiAccess; // this is our raw MIDI data, inputs, outputs, and sysex status
 
-     var inputs = midi.inputs.values();
-     // loop over all available inputs and listen for any MIDI input
-     for (var input = inputs.next(); input && !input.done; input = inputs.next()) {
-         // each time there is a midi message call the onMIDIMessage function
-         input.value.onmidimessage = onMIDIMessage;
-     }
+    var inputs = midi.inputs.values();
+    // loop over all available inputs and listen for any MIDI input
+    for (var input = inputs.next(); input && !input.done; input = inputs.next()) {
+        // each time there is a midi message call the onMIDIMessage function
+        input.value.onmidimessage = onMIDIMessage;
+    }
 }
 
 function onMIDIFailure(e) {
@@ -45,11 +45,11 @@ var num_sides = 3;
 Physics(function (world) {
     // bounds of the window
     var viewportBounds = Physics.aabb(0, 0, window.innerWidth, window.innerHeight)
-    ,width = window.innerWidth
-    ,height = window.innerHeight
-    ,edgeBounce
-    ,renderer
-    ;
+        , width = window.innerWidth
+        , height = window.innerHeight
+        , edgeBounce
+        , renderer
+        ;
 
 
     // Plz give me a number > 3
@@ -67,18 +67,18 @@ Physics(function (world) {
             angles.push(angle * i);
         }
 
-        return angles.map(function(angle) {
+        return angles.map(function (angle) {
             var x = sideDist * Math.cos(angle);
             var y = sideDist * Math.sin(angle);
             var rotation = angle;
 
             return Physics.body('rectangle', {    //right side
                 x: S(x)
-                ,y: S(y)
-                ,width: S(width)
-                ,height: S(sideLength + width / 2)
-                ,mass: mass
-                ,angle: rotation
+                , y: S(y)
+                , width: S(width)
+                , height: S(sideLength + width / 2)
+                , mass: mass
+                , angle: rotation
             })
         })
     }
@@ -86,10 +86,10 @@ Physics(function (world) {
     function spawnCircle(x, y, r, color, note) {
         var circle = Physics.body('circle', {
             x: x
-            ,y: y
-            ,mass: 1
-            ,radius: r
-            ,styles: {
+            , y: y
+            , mass: 1
+            , radius: r
+            , styles: {
                 fillStyle: color
             }
         });
@@ -98,7 +98,7 @@ Physics(function (world) {
     }
 
     // scale relative to window width
-    function S( n ){
+    function S(n) {
         return n * window.innerWidth / 600;
     }
 
@@ -119,8 +119,8 @@ Physics(function (world) {
     // constrain objects to these bounds
     edgeBounce = Physics.behavior('edge-collision-detection', {
         aabb: viewportBounds
-        ,restitution: 0.9
-        ,cof: 0.5
+        , restitution: 0.9
+        , cof: 0.5
     });
 
     // resize events
@@ -135,49 +135,54 @@ Physics(function (world) {
 
     // create the zero, spinning regular polygon
     var zero = Physics.body('compound', {
-        x: width/2
-        ,y: height/2
-        ,treatment: 'kinematic'
-        ,styles: {
+        x: width / 2
+        , y: height / 2
+        , treatment: 'kinematic'
+        , styles: {
             fillStyle: '#ffffff'
-            ,lineWidth: 1
-            ,strokeStyle: '#ffffff'
+            , lineWidth: 1
+            , strokeStyle: '#ffffff'
 
         }
-        ,children: regularPolygon(3, 100)
+        , children: regularPolygon(3, 100)
     });
 
     world.add(zero);
 
     // add some gravity
     var gravity = Physics.behavior('constant-acceleration', {
-        acc: { x : 0, y: 0.0004 } // this is the default
+        acc: { x: 0, y: 0.0004 } // this is the default
     });
-    world.add( gravity );
+    world.add(gravity);
 
     // add things to the world
     world.add([
-        Physics.behavior('interactive', { el: renderer.container })
-        ,Physics.behavior('body-impulse-response')
-        ,Physics.behavior('body-collision-detection')
-        ,Physics.behavior('sweep-prune')
-        ,edgeBounce
+        /*Physics.behavior('interactive', { el: renderer.container })
+        ,*/
+        Physics.behavior('body-impulse-response')
+        , Physics.behavior('body-collision-detection')
+        , Physics.behavior('sweep-prune')
+        , edgeBounce
     ]);
 
-    world.on('collisions:detected', function(data) {
+    world.on('collisions:detected', function (data) {
         var bodyA = data.collisions[0].bodyA;
         var bodyB = data.collisions[0].bodyB;
 
-        if (bodyA.note)
-            input.receiveInput(bodyA.note);
-        if (bodyB.note)
-            input.receiveInput(bodyB.note);
+        if (bodyA.note) {
+            input.receiveInput(bodyA.note, bodyA.vol);
+        }
+        if (bodyB.note){
+            input.receiveInput(bodyB.note, bodyB.vol);
+        }
     });
 
 
     // subscribe to ticker to advance the simulation
-    Physics.util.ticker.on(function( time ) {
-        world.step( time );
-        world.findOne({'treatment':'kinematic'}).state.angular.vel = zero_ang_vel;
+    Physics.util.ticker.on(function (time) {
+        world.step(time);
+        world.findOne({ 'treatment': 'kinematic' }).state.angular.vel = zero_ang_vel;
+
+
     });
 });

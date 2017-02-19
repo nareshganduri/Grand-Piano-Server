@@ -17,13 +17,15 @@ function MidiHandler(Pizzicato) {
         return base * Math.pow(2, (midiNumber - 57) / 12);
     }
 
-    function playMidiNote(midiNumber) {
+    function playMidiNote(midiNumber, vol) {
         if (!midiToFrequency[midiNumber]) {
+            vol = vol || 0.1;
             midiToFrequency[midiNumber] = new Pizzicato.Sound({
                 source: 'wave',
                 options: {
                     type: 'sawtooth',
-                    frequency: convertMidiToFrequency(midiNumber)}
+                    frequency: convertMidiToFrequency(midiNumber),
+                    volume: vol}
             });
         }
 
@@ -41,7 +43,7 @@ function MidiHandler(Pizzicato) {
                 options: {
                     type: 'sawtooth',
                     frequency: convertMidiToFrequency(midiNumber),
-                    volume: 0.1}
+                    volume: 0}
 
             });
         }

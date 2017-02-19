@@ -14,8 +14,8 @@ function InputHandler(Physics, Pizzicato, world, regularPolygon, width, height) 
 
     getKeyboardInput();
 
-    function receiveInput(midiNumber) {
-        midiHandler.receiveMidiNumber(midiNumber);
+    function receiveInput(midiNumber, vol) {
+        midiHandler.receiveMidiNumber(midiNumber, vol);
     }
 
     this.receiveInput = receiveInput;
@@ -82,9 +82,11 @@ function InputHandler(Physics, Pizzicato, world, regularPolygon, width, height) 
                     , radius: 10
                     , styles: {
                         fillStyle: map["color"]
-                    }
+                    },
+                    note: midiNumber,
+                    vol: 1
                 });
-                circle.note = midiNumber;
+        console.log(world.currenttime);
                 world.add(circle);
                 //receiveInput(midiNumber);
             }
