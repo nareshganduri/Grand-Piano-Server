@@ -65,13 +65,14 @@ var physicsEngine = Physics(function (world) {
                     break;
                 case 128:
                     console.log('note off');
-                    break
+                    break;
                 default:
                     break
             }    
         }
     }
 
+    var piano = new Piano();
 
     ///////////////////////////////////////////////////PHYSICS////////////////////////////////////////////////////////////
     // Plz give me a number > 3
@@ -103,7 +104,7 @@ var physicsEngine = Physics(function (world) {
                 ,angle: rotation
             })
         })
-    }
+    };
 
     var spawnCircle = function (x, y, r, color, note) {
         console.log(note);
@@ -119,14 +120,23 @@ var physicsEngine = Physics(function (world) {
         circle.note = note;
         circle.life = BALL_LIFE;
         world.add(circle);
-    }
+    };
 
     // scale relative to window width
     function S( n ){
         return n * window.innerWidth / 600;
     }
 
-    var input = new InputHandler(Physics, Pizzicato, world, regularPolygon, width, height);
+    var input = new InputHandler(Physics, Pizzicato, world, regularPolygon, width, height, piano);
+
+    // some fun colors
+    var colors = {
+        blue: '0x1d6b98',
+        blueDark: '0x14546f',
+        red: '0xdc322f',
+        darkRed: '0xa42222',
+        white: '#ffffff'
+    };
 
     // create a renderer
     renderer = Physics.renderer('canvas', {
@@ -157,6 +167,35 @@ var physicsEngine = Physics(function (world) {
 
     }, true);
 
+    var circles = [
+        Physics.body('circle', {
+            x: width/2
+            ,y: height/2
+            ,vx: 0.3
+            ,radius: 5
+            ,styles: {
+                fillStyle: '#cb4b16'
+            }
+        })
+        ,
+        Physics.body('circle', {
+            x: width/2
+            ,y: height/2
+            ,vx: -0.3
+            ,radius: 5
+            ,styles: {
+                fillStyle: '#6c71c4'
+            }
+        })
+    ];
+
+    circles.forEach(function(circle) {
+        var major_notes = [0, 2, 4, 5, 7, 9, 11];
+        // circle.note = Math.floor(Math.random() * 20) + 40;
+        circle.note = major_notes[Math.floor(Math.random() * major_notes.length)]+60
+        world.add(circle);
+    });
+
     // create the zero, spinning regular polygon
     var zero = Physics.body('compound', {
         x: width/2
@@ -166,7 +205,6 @@ var physicsEngine = Physics(function (world) {
             fillStyle: '#ffffff'
             ,lineWidth: 1
             ,strokeStyle: '#ffffff'
-
         }
         ,children: regularPolygon(6, 100)
     });
@@ -188,6 +226,8 @@ var physicsEngine = Physics(function (world) {
         ,Physics.behavior('sweep-prune')
         ,edgeBounce
     ]);
+
+    piano.draw(world, width / 2 + 500, height - 150);
 
     world.on('collisions:detected', function(data) {
         var bodyA = data.collisions[0].bodyA;
