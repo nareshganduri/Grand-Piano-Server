@@ -66,6 +66,7 @@ function InputHandler(Physics, Pizzicato, world, regularPolygon, width, height) 
         window.onkeyup = function (e) {
 
             var zero = world.findOne({ 'treatment': 'kinematic' });
+
             var keyPressed = String.fromCharCode(e.keyCode).toLowerCase();
 
             /* if (that.keyBindings[e.key]) {
@@ -84,9 +85,13 @@ function InputHandler(Physics, Pizzicato, world, regularPolygon, width, height) 
                         fillStyle: map["color"]
                     },
                     note: midiNumber,
-                    vol: 1
+                    vol: 1,
+                    opacity: 1
                 });
-        console.log(world.currenttime);
+                        
+                console.log(world.currenttime);
+                circle.note = midiNumber;
+                circle.life = BALL_LIFE;
                 world.add(circle);
                 //receiveInput(midiNumber);
             }
