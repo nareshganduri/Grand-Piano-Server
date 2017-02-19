@@ -1,8 +1,8 @@
 /* global PitchClassMapping */
 
-$(document).ready(function () {
-    var ws = new WebSocket('ws://localhost:1234', 'echo-protocol');
-});
+// $(document).ready(function () {
+//    var ws = new WebSocket('ws://localhost:1234', 'echo-protocol');
+// });
 
 // global variables
 var zero_ang_vel = 0.001;
