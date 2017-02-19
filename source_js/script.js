@@ -114,10 +114,11 @@ var physicsEngine = Physics(function (world) {
             , radius: r
             , styles: {
                 fillStyle: color
-            }
+            },
+            note: note,
+            life: BALL_LIFE,
+            vol: 1
         });
-        circle.note = note;
-        circle.life = BALL_LIFE;
         world.add(circle);
     }
 
@@ -127,6 +128,7 @@ var physicsEngine = Physics(function (world) {
     }
 
     var input = new InputHandler(Physics, Pizzicato, world, regularPolygon, width, height);
+    var midiHandler = new MidiHandler(Pizzicato);
 
     // create a renderer
     renderer = Physics.renderer('canvas', {
@@ -188,7 +190,9 @@ var physicsEngine = Physics(function (world) {
         var bodyA = data.collisions[0].bodyA;
         var bodyB = data.collisions[0].bodyB;
 
-            input.receiveInput(bodyA.note);
+        if (bodyA.note) {
+            midiHandler.receiveMidiNumber(bodyA.note, bodyA.vol);
+            bodyA.vol -= 1/BALL_LIFE;
             bodyA.life--;
             bodyA.styles.fillStyle = shadeBlendConvert(-(1.5/BALL_LIFE), bodyA.styles.fillStyle);
             bodyA.view = null;
@@ -199,7 +203,8 @@ var physicsEngine = Physics(function (world) {
             }            
         }
         if (bodyB.note) {
-            input.receiveInput(bodyB.note);
+            midiHandler.receiveMidiNumber(bodyB.note, bodyB.vol)
+            bodyB.vol -= 1/BALL_LIFE
             bodyB.life--;
             bodyB.styles.fillStyle = shadeBlendConvert(-(1.5/BALL_LIFE), bodyB.styles.fillStyle);
             bodyB.view = null;
@@ -217,7 +222,5 @@ var physicsEngine = Physics(function (world) {
     Physics.util.ticker.on(function (time) {
         world.step(time);
         world.findOne({ 'treatment': 'kinematic' }).state.angular.vel = zero_ang_vel;
-
-
     });
 });

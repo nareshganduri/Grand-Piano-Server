@@ -26,8 +26,8 @@ function MidiHandler(Pizzicato) {
     var midiToFrequency = {};
 
     // Send midi to be played
-    this.receiveMidiNumber = function (midiNumber) {
-        playMidiNote(midiNumber);
+    this.receiveMidiNumber = function (midiNumber, vol) {
+        playMidiNote(midiNumber, vol);
     };
 
     function convertMidiToFrequency(midiNumber) {
@@ -35,16 +35,6 @@ function MidiHandler(Pizzicato) {
     }
 
     function playMidiNote(midiNumber, vol) {
-        if (!midiToFrequency[midiNumber]) {
-            vol = vol || 0.1;
-            midiToFrequency[midiNumber] = new Pizzicato.Sound({
-                source: 'wave',
-                options: {
-                    type: 'sawtooth',
-                    frequency: convertMidiToFrequency(midiNumber),
-                    volume: vol}
-            });
-        }
         var sound;
         if (midiNumber >= 60 && midiNumber <= 72) { // try to use piano sounds for the octave we are using
             sound = piano_sound_files[midiNumber];
@@ -52,6 +42,7 @@ function MidiHandler(Pizzicato) {
         else {
             sound = midiToFrequency[midiNumber];
         }
+        sound.volume = vol;
         sound.play();
         setTimeout(function () {
             sound.stop();
