@@ -167,35 +167,6 @@ var physicsEngine = Physics(function (world) {
 
     }, true);
 
-    var circles = [
-        Physics.body('circle', {
-            x: width/2
-            ,y: height/2
-            ,vx: 0.3
-            ,radius: 5
-            ,styles: {
-                fillStyle: '#cb4b16'
-            }
-        })
-        ,
-        Physics.body('circle', {
-            x: width/2
-            ,y: height/2
-            ,vx: -0.3
-            ,radius: 5
-            ,styles: {
-                fillStyle: '#6c71c4'
-            }
-        })
-    ];
-
-    circles.forEach(function(circle) {
-        var major_notes = [0, 2, 4, 5, 7, 9, 11];
-        // circle.note = Math.floor(Math.random() * 20) + 40;
-        circle.note = major_notes[Math.floor(Math.random() * major_notes.length)]+60
-        world.add(circle);
-    });
-
     // create the zero, spinning regular polygon
     var zero = Physics.body('compound', {
         x: width/2
@@ -227,7 +198,7 @@ var physicsEngine = Physics(function (world) {
         ,edgeBounce
     ]);
 
-    piano.draw(world, width / 2 + 500, height - 150);
+    piano.draw(world, width / 2, height - 150);
 
     world.on('collisions:detected', function(data) {
         var bodyA = data.collisions[0].bodyA;
