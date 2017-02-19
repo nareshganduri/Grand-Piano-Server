@@ -6,7 +6,7 @@
 
 /* global PitchClassMapping */
 
-function InputHandler(Physics, Pizzicato, world, regularPolygon, width, height) {
+function InputHandler(Physics, Pizzicato, world, regularPolygon, width, height, piano) {
 
     var baseOctave = 60;
     var heldNotes = [];
@@ -63,15 +63,19 @@ function InputHandler(Physics, Pizzicato, world, regularPolygon, width, height) 
         */
 
     function defaultKey() {
+        window.onkeydown = function(e) {
+            var keyPressed = String.fromCharCode(e.keyCode).toLowerCase();
+            if (keyPressed in PitchClassMapping.keyboardCharToPitchClass) {
+                var map = PitchClassMapping.keyboardCharToPitchClass[keyPressed];
+                piano.setKeysActive([parseInt(map["pitch"])]);
+            }
+        };
+
         window.onkeyup = function (e) {
 
             var zero = world.findOne({ 'treatment': 'kinematic' });
 
             var keyPressed = String.fromCharCode(e.keyCode).toLowerCase();
-
-            /* if (that.keyBindings[e.key]) {
-                 that.keyBindings[e.key].forEach(function(f) {f()});
-             }*/
 
             if (keyPressed in PitchClassMapping.keyboardCharToPitchClass) {
                 var map = PitchClassMapping.keyboardCharToPitchClass[keyPressed];
@@ -89,6 +93,8 @@ function InputHandler(Physics, Pizzicato, world, regularPolygon, width, height) 
                 circle.note = midiNumber;
                 circle.life = BALL_LIFE;
                 world.add(circle);
+
+                piano.setKeysNormal([parseInt(map["pitch"])]);
                 //receiveInput(midiNumber);
             }
 
@@ -140,7 +146,6 @@ function InputHandler(Physics, Pizzicato, world, regularPolygon, width, height) 
                 // increase rotation
                 zero_ang_vel += 0.00015;
             }
-
 
             rapidFire(keyPressed);
         };
