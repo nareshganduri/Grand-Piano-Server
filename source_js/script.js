@@ -1,6 +1,6 @@
 /* global PitchClassMapping */
 
-$(document).ready(function(){
+$(document).ready(function () {
     var ws = new WebSocket('ws://localhost:1234', 'echo-protocol');
 });
 
@@ -90,18 +90,18 @@ var physicsEngine = Physics(function (world) {
             angles.push(angle * i);
         }
 
-        return angles.map(function(angle) {
+        return angles.map(function (angle) {
             var x = sideDist * Math.cos(angle);
             var y = sideDist * Math.sin(angle);
             var rotation = angle;
 
             return Physics.body('rectangle', {    //right side
                 x: S(x)
-                ,y: S(y)
-                ,width: S(width)
-                ,height: S(sideLength + width / 2)
-                ,mass: mass
-                ,angle: rotation
+                , y: S(y)
+                , width: S(width)
+                , height: S(sideLength + width / 2)
+                , mass: mass
+                , angle: rotation
             })
         })
     };
@@ -110,25 +110,26 @@ var physicsEngine = Physics(function (world) {
         console.log(note);
         var circle = Physics.body('circle', {
             x: x
-            ,y: y
-            ,mass: 1
-            ,radius: r
-            ,styles: {
+            , y: y
+            , mass: 1
+            , radius: r
+            , styles: {
                 fillStyle: color
-            }
+            },
+            note: note,
+            life: BALL_LIFE,
+            vol: 1
         });
-        circle.note = note;
-        circle.life = BALL_LIFE;
         world.add(circle);
     };
 
     // scale relative to window width
-    function S( n ){
+    function S(n) {
         return n * window.innerWidth / 600;
     }
 
     var input = new InputHandler(Physics, Pizzicato, world, regularPolygon, width, height, piano);
-
+    var midiHandler = new MidiHandler(Pizzicato); 
     // some fun colors
     var colors = {
         blue: '0x1d6b98',
@@ -137,7 +138,6 @@ var physicsEngine = Physics(function (world) {
         darkRed: '0xa42222',
         white: '#ffffff'
     };
-
     // create a renderer
     renderer = Physics.renderer('canvas', {
         el: 'viewport'
@@ -151,13 +151,7 @@ var physicsEngine = Physics(function (world) {
     });
 
     // constrain objects to these bounds
-    // edgeBounce = Physics.behavior('edge-collision-detection', {
-    //     aabb: viewportBounds
-    //     ,restitution: 0.9
-    //     ,cof: 0.5
-    // });
 
-    // resize events
     window.addEventListener('resize', function () {
 
         // as of 0.7.0 the renderer will auto resize... so we just take the values from the renderer
@@ -169,13 +163,13 @@ var physicsEngine = Physics(function (world) {
 
     // create the zero, spinning regular polygon
     var zero = Physics.body('compound', {
-        x: width/2
-        ,y: height/2
-        ,treatment: 'kinematic'
-        ,styles: {
+        x: width / 2
+        , y: height / 2
+        , treatment: 'kinematic'
+        , styles: {
             fillStyle: '#ffffff'
-            ,lineWidth: 1
-            ,strokeStyle: '#ffffff'
+            , lineWidth: 1
+            , strokeStyle: '#ffffff'
         }
         ,children: regularPolygon(6, 100)
     });
@@ -185,27 +179,32 @@ var physicsEngine = Physics(function (world) {
 
     // add some gravity
     var gravity = Physics.behavior('constant-acceleration', {
-        acc: { x : 0, y: 0.0004 } // this is the default
+        acc: { x: 0, y: 0.0004 } // this is the default
     });
-    world.add( gravity );
+    world.add(gravity);
 
     // add things to the world
     world.add([
-        Physics.behavior('interactive', { el: renderer.container })
-        ,Physics.behavior('body-impulse-response')
-        ,Physics.behavior('body-collision-detection')
-        ,Physics.behavior('sweep-prune')
-        ,edgeBounce
+        /*Physics.behavior('interactive', { el: renderer.container })
+        ,*/
+        Physics.behavior('body-impulse-response')
+        , Physics.behavior('body-collision-detection')
+        , Physics.behavior('sweep-prune')
+        , edgeBounce
     ]);
 
     piano.draw(world, width / 2, height - 150);
 
     world.on('collisions:detected', function(data) {
+
         var bodyA = data.collisions[0].bodyA;
         var bodyB = data.collisions[0].bodyB;
 
         if (bodyA.note) {
-            input.receiveInput(bodyA.note);
+            midiHandler.receiveMidiNumber(bodyA.note, bodyA.vol);
+
+            // TODO: Change function of decreasing volume?
+            bodyA.vol -= 1/BALL_LIFE;
             bodyA.life--;
             bodyA.styles.fillStyle = shadeBlendConvert(-(1.5/BALL_LIFE), bodyA.styles.fillStyle);
             bodyA.view = null;
@@ -216,7 +215,8 @@ var physicsEngine = Physics(function (world) {
             }            
         }
         if (bodyB.note) {
-            input.receiveInput(bodyB.note);
+            midiHandler.receiveMidiNumber(bodyB.note, bodyB.vol)
+            bodyB.vol -= 1/BALL_LIFE
             bodyB.life--;
             bodyB.styles.fillStyle = shadeBlendConvert(-(1.5/BALL_LIFE), bodyB.styles.fillStyle);
             bodyB.view = null;
@@ -227,13 +227,11 @@ var physicsEngine = Physics(function (world) {
             }            
         }
 
-        
     });
 
-
     // subscribe to ticker to advance the simulation
-    Physics.util.ticker.on(function( time ) {
-        world.step( time );
-        world.findOne({'treatment':'kinematic'}).state.angular.vel = zero_ang_vel;
+    Physics.util.ticker.on(function (time) {
+        world.step(time);
+        world.findOne({ 'treatment': 'kinematic' }).state.angular.vel = zero_ang_vel;
     });
 });

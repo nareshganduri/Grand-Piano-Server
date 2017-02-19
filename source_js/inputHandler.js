@@ -10,57 +10,19 @@ function InputHandler(Physics, Pizzicato, world, regularPolygon, width, height, 
 
     var baseOctave = 60;
     var heldNotes = [];
-    var midiHandler = new MidiHandler(Pizzicato);
+    //var midiHandler = new MidiHandler(Pizzicato);
 
     getKeyboardInput();
 
-    function receiveInput(midiNumber) {
-        midiHandler.receiveMidiNumber(midiNumber);
+    function receiveInput(midiNumber, vol) {
+        midiHandler.receiveMidiNumber(midiNumber, vol);
     }
 
     this.receiveInput = receiveInput;
 
     function getKeyboardInput() {
         defaultKey();
-        // sustain();
     }
-
-    /*
-        function sustain() {
-            window.onkeydown = function (e) {
-                var keyPressed = String.fromCharCode(e.keyCode).toLowerCase();
-                rapidFire(keyPressed);
-    
-                if (keyPressed in PitchClassMapping.keyboardCharToPitchClass) {
-                    var midiNumber = baseOctave + parseInt(PitchClassMapping.keyboardCharToPitchClass[keyPressed]);
-    
-                    var index = heldNotes.indexOf(midiNumber);
-                    if (index === -1) {
-                        heldNotes.push(midiNumber);
-                    }
-                    
-                    /* Maybe only create on new pitch class? 
-                     * As opposed to every instance regardless of pitch class
-                     * */
-    /*
-                    midiHandler.play(midiNumber);
-                }
-            };
-    
-            window.onkeyup = function (e) {
-                var keyPressed = String.fromCharCode(e.keyCode).toLowerCase();
-                if (keyPressed in PitchClassMapping.keyboardCharToPitchClass) {
-                    var midiNumber = baseOctave + parseInt(PitchClassMapping.keyboardCharToPitchClass[keyPressed]);
-                    var index = heldNotes.indexOf(midiNumber);
-                    if (index > -1) {
-                        heldNotes.splice(index, 1);
-                    }
-    
-                    midiHandler.stop(midiNumber);
-                }
-            };
-        }
-        */
 
     function defaultKey() {
         window.onkeydown = function(e) {
@@ -87,9 +49,12 @@ function InputHandler(Physics, Pizzicato, world, regularPolygon, width, height, 
                     , radius: 10
                     , styles: {
                         fillStyle: map["color"]
-                        ,opacity: 1
-                    }
+                    },
+                    note: midiNumber,
+                    vol: 1,
+                    opacity: 1
                 });
+                        
                 circle.note = midiNumber;
                 circle.life = BALL_LIFE;
                 world.add(circle);
@@ -146,16 +111,6 @@ function InputHandler(Physics, Pizzicato, world, regularPolygon, width, height, 
                 // increase rotation
                 zero_ang_vel += 0.00015;
             }
-
-            rapidFire(keyPressed);
         };
-    }
-
-    function rapidFire(keyPressed) {
-        if (keyPressed === "q") {
-            var rand = baseOctave + Math.ceil(Math.random() * 12);
-
-            receiveInput(rand);
-        }
     }
 }
