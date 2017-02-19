@@ -192,6 +192,8 @@ var physicsEngine = Physics(function (world) {
 
         if (bodyA.note) {
             midiHandler.receiveMidiNumber(bodyA.note, bodyA.vol);
+
+            // TODO: Change function of decreasing volume?
             bodyA.vol -= 1/BALL_LIFE;
             bodyA.life--;
             bodyA.styles.fillStyle = shadeBlendConvert(-(1.5/BALL_LIFE), bodyA.styles.fillStyle);
@@ -216,7 +218,6 @@ var physicsEngine = Physics(function (world) {
         }
 
     });
-
 
     // subscribe to ticker to advance the simulation
     Physics.util.ticker.on(function (time) {
