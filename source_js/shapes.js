@@ -21,12 +21,12 @@ function Piano() {
             console.log(key);
             if ([1,3,6,8,10].indexOf(key) >= 0) {
                 // black key
-                that.blackKeyBodies[idx].styles={fillStyle:color};
+                that.blackKeyBodies[idx].styles={fillStyle:color, lineWidth: 1, strokeStyle: '#000'};
                 that.blackKeyBodies[idx].view = null;
                 that.blackKeyBodies[idx].recalc();
             }
             else {
-                that.whiteKeyBodies[idx].styles={fillStyle:color};
+                that.whiteKeyBodies[idx].styles={fillStyle:color, lineWidth: 1, strokeStyle: '#000'};
                 that.whiteKeyBodies[idx].view = null;
                 that.whiteKeyBodies[idx].recalc();
             }
@@ -51,12 +51,12 @@ function Piano() {
 
             if ([1,3,6,8,10].indexOf(key) >= 0) {
                 // black key
-                that.blackKeyBodies[idx].styles={fillStyle:'#000'};
+                that.blackKeyBodies[idx].styles={fillStyle:'#000', lineWidth: 1, strokeStyle: '#000'};
                 that.blackKeyBodies[idx].view = null;
                 that.blackKeyBodies[idx].recalc();
             }
             else {
-                that.whiteKeyBodies[idx].styles={fillStyle:'#fff'};
+                that.whiteKeyBodies[idx].styles={fillStyle:'#fff', lineWidth: 1, strokeStyle: '#000'};
                 that.whiteKeyBodies[idx].view = null;
                 that.whiteKeyBodies[idx].recalc();
             }
