@@ -65,13 +65,14 @@ var physicsEngine = Physics(function (world) {
                     break;
                 case 128:
                     console.log('note off');
-                    break
+                    break;
                 default:
                     break
             }    
         }
     }
 
+    var piano = new Piano();
 
     ///////////////////////////////////////////////////PHYSICS////////////////////////////////////////////////////////////
     // Plz give me a number > 3
@@ -103,7 +104,7 @@ var physicsEngine = Physics(function (world) {
                 , angle: rotation
             })
         })
-    }
+    };
 
     var spawnCircle = function (x, y, r, color, note) {
         console.log(note);
@@ -120,16 +121,23 @@ var physicsEngine = Physics(function (world) {
             vol: 1
         });
         world.add(circle);
-    }
+    };
 
     // scale relative to window width
     function S(n) {
         return n * window.innerWidth / 600;
     }
 
-    var input = new InputHandler(Physics, Pizzicato, world, regularPolygon, width, height);
-    var midiHandler = new MidiHandler(Pizzicato);
-
+    var input = new InputHandler(Physics, Pizzicato, world, regularPolygon, width, height, piano);
+    var midiHandler = new MidiHandler(Pizzicato); 
+    // some fun colors
+    var colors = {
+        blue: '0x1d6b98',
+        blueDark: '0x14546f',
+        red: '0xdc322f',
+        darkRed: '0xa42222',
+        white: '#ffffff'
+    };
     // create a renderer
     renderer = Physics.renderer('canvas', {
         el: 'viewport'
@@ -162,7 +170,6 @@ var physicsEngine = Physics(function (world) {
             fillStyle: '#ffffff'
             , lineWidth: 1
             , strokeStyle: '#ffffff'
-
         }
         ,children: regularPolygon(6, 100)
     });
@@ -186,7 +193,10 @@ var physicsEngine = Physics(function (world) {
         , edgeBounce
     ]);
 
-    world.on('collisions:detected', function (data) {
+    piano.draw(world, width / 2, height - 150);
+
+    world.on('collisions:detected', function(data) {
+
         var bodyA = data.collisions[0].bodyA;
         var bodyB = data.collisions[0].bodyB;
 
