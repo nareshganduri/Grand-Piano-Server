@@ -17,7 +17,7 @@ var piano_sound_files = {
     69: new Pizzicato.Sound('./sounds/m4a/a1.m4a'),
     70: new Pizzicato.Sound('./sounds/m4a/a1s.m4a'),
     71: new Pizzicato.Sound('./sounds/m4a/b1.m4a'),
-    72: new Pizzicato.Sound('./sounds/m4a/c2.m4a'),
+    72: new Pizzicato.Sound('./sounds/m4a/c2.m4a')
 };
        
 
@@ -35,13 +35,21 @@ function MidiHandler(Pizzicato) {
     }
 
     function playMidiNote(midiNumber, vol) {
-        var sound;
-        if (midiNumber >= 60 && midiNumber <= 72) { // try to use piano sounds for the octave we are using
-            sound = piano_sound_files[midiNumber];
+        if (!midiToFrequency[midiNumber]) {
+            midiToFrequency[midiNumber] = new Pizzicato.Sound({
+                source: 'wave',
+                options: {
+                    type: 'sawtooth',
+                    frequency: convertMidiToFrequency(midiNumber),
+                    volume: 1}
+
+            });
         }
-        else {
-            sound = midiToFrequency[midiNumber];
-        }
+
+        var sound = midiToFrequency[midiNumber];
+        // if (midiNumber >= 60 && midiNumber <= 72) { // try to use piano sounds for the octave we are using
+            // sound = piano_sound_files[midiNumber];
+        // }
         sound.volume = vol;
         sound.play();
         setTimeout(function () {

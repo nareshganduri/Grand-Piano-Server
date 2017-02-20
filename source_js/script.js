@@ -1,8 +1,8 @@
 /* global PitchClassMapping */
 
-$(document).ready(function () {
-    var ws = new WebSocket('ws://localhost:1234', 'echo-protocol');
-});
+// $(document).ready(function () {
+//    var ws = new WebSocket('ws://localhost:1234', 'echo-protocol');
+// });
 
 // global variables
 var zero_ang_vel = 0.001;
@@ -60,8 +60,9 @@ var physicsEngine = Physics(function (world) {
         if (velocity > 0) {
             switch(type) {
                 case 144: //noteon
-                    console.log('note on');
-                    spawnCircle(width/2, height/2, 10, '#ffffff', data[1]);
+                    var color = '#' + PitchClassMapping.pitchClassToColor[data[1]%12];
+                    console.log(color);
+                    spawnCircle(width/2, height/2, 10, color, data[1]);
                     break;
                 case 128:
                     console.log('note off');
@@ -118,7 +119,8 @@ var physicsEngine = Physics(function (world) {
             },
             note: note,
             life: BALL_LIFE,
-            vol: 1
+            vol: 1,
+            opacity: 1
         });
         world.add(circle);
     };
