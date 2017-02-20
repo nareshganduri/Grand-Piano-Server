@@ -129,7 +129,6 @@ var physicsEngine = Physics(function (world) {
     }
 
     var input = new InputHandler(Physics, Pizzicato, world, regularPolygon, width, height, piano);
-    var midiHandler = new MidiHandler(Pizzicato); 
     // some fun colors
     var colors = {
         blue: '0x1d6b98',
@@ -185,8 +184,8 @@ var physicsEngine = Physics(function (world) {
 
     // add things to the world
     world.add([
-        /*Physics.behavior('interactive', { el: renderer.container })
-        ,*/
+        Physics.behavior('interactive', { el: renderer.container }),
+
         Physics.behavior('body-impulse-response')
         , Physics.behavior('body-collision-detection')
         , Physics.behavior('sweep-prune')
@@ -212,7 +211,7 @@ var physicsEngine = Physics(function (world) {
 
             if (bodyA.life <= 0) {
                 world.remove(bodyA);
-            }            
+            }
         }
         if (bodyB.note) {
             midiHandler.receiveMidiNumber(bodyB.note, bodyB.vol)
@@ -224,14 +223,32 @@ var physicsEngine = Physics(function (world) {
 
             if (bodyB.life <= 0) {
                 world.remove(bodyB);
-            }            
+            }
         }
 
     });
 
+
+    var laskTick = null;
     // subscribe to ticker to advance the simulation
     Physics.util.ticker.on(function (time) {
         world.step(time);
         world.findOne({ 'treatment': 'kinematic' }).state.angular.vel = zero_ang_vel;
+
+        if (!laskTick) {
+            laskTick = time;
+            return;
+        }
+        var dt = time - laskTick;
+        laskTick = time;
+
+        world.find({'class':'projectile'}).forEach(function(p) {
+            if (!p.life || p.life <= 0) {
+                world.remove(p);
+            }
+            p.life -= dt;
+            if (p.onTick)
+                p.onTick(dt, p, world);
+        })
     });
 });

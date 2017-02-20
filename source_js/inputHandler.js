@@ -25,22 +25,14 @@ function InputHandler(Physics, Pizzicato, world, regularPolygon, width, height, 
     }
 
     function defaultKey() {
+
+        var zero = world.findOne({ 'treatment': 'kinematic' });
+
         window.onkeydown = function(e) {
             var keyPressed = String.fromCharCode(e.keyCode).toLowerCase();
             if (keyPressed in PitchClassMapping.keyboardCharToPitchClass) {
                 var map = PitchClassMapping.keyboardCharToPitchClass[keyPressed];
-                piano.setKeysActive([parseInt(map["pitch"])]);
-            }
-        };
 
-        window.onkeyup = function (e) {
-
-            var zero = world.findOne({ 'treatment': 'kinematic' });
-
-            var keyPressed = String.fromCharCode(e.keyCode).toLowerCase();
-
-            if (keyPressed in PitchClassMapping.keyboardCharToPitchClass) {
-                var map = PitchClassMapping.keyboardCharToPitchClass[keyPressed];
                 var midiNumber = baseOctave + parseInt(map["pitch"]);
                 var circle = Physics.body('circle', {
                     x: width/2
@@ -54,13 +46,27 @@ function InputHandler(Physics, Pizzicato, world, regularPolygon, width, height, 
                     vol: 1,
                     opacity: 1
                 });
-                        
+
                 circle.note = midiNumber;
                 circle.life = BALL_LIFE;
                 world.add(circle);
 
+
+                var pianoKey = parseInt(map["pitch"]);
+                piano.setKeysActive([pianoKey]);
+                var keyPos = piano.getKeyPosition(pianoKey);
+
+                new Projectile(20, map["color"], 1000).spawn(world, keyPos.x, keyPos.y, -1);
+
+                receiveInput(midiNumber);
+            }
+        };
+
+        window.onkeyup = function (e) {
+            var keyPressed = String.fromCharCode(e.keyCode).toLowerCase();
+            if (keyPressed in PitchClassMapping.keyboardCharToPitchClass) {
+                var map = PitchClassMapping.keyboardCharToPitchClass[keyPressed];
                 piano.setKeysNormal([parseInt(map["pitch"])]);
-                //receiveInput(midiNumber);
             }
 
             else if (e.keyCode == 187) { // = key
@@ -114,3 +120,5 @@ function InputHandler(Physics, Pizzicato, world, regularPolygon, width, height, 
         };
     }
 }
+
+const midiHandler = new MidiHandler(Pizzicato);
