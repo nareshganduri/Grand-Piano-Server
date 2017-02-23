@@ -44,7 +44,8 @@ function InputHandler(Physics, Pizzicato, world, regularPolygon, width, height, 
                     },
                     note: midiNumber,
                     vol: 1,
-                    opacity: 1
+                    opacity: 1,
+                    despawn: true
                 });
 
                 circle.note = midiNumber;
