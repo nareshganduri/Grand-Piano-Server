@@ -30,18 +30,18 @@ PitchClassMapping.pitchClassToNoteName = {
 };
 
 PitchClassMapping.pitchClassToColor = {
-    0: "FF0000", //RED
-    7: "FF5200", //***orange-red
-    2: "FFA500", //ORANGE
-    9: "FFD200", //***yellow-orange
-    4: "FFFF00", //YELLOW
-    11: "80C000", //***yellow-green
-    6: "00FF00", //GREEN
-    1: "004080", //***blue-green
-    8: "0000FF", //BLUE
-    3: "4000C0", //***blue-purple
-    10: "800080", //PURPLE
-    5: "C00040"     //***purple-red    
+    0: "#FF0000", //RED
+    7: "#FF5200", //***orange-red
+    2: "#FFA500", //ORANGE
+    9: "#FFD200", //***yellow-orange
+    4: "#FFFF00", //YELLOW
+    11: "#80C000", //***yellow-green
+    6: "#00FF00", //GREEN
+    1: "#004080", //***blue-green
+    8: "#0000FF", //BLUE
+    3: "#4000C0", //***blue-purple
+    10: "#800080", //PURPLE
+    5: "#C00040"     //***purple-red
 };
 
 PitchClassMapping.keyboardCharToPitchClass = {

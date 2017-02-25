@@ -9,6 +9,9 @@ function Piano() {
     this.whiteKeyBodies = [];
     this.blackKeyBodies = [];
 
+    this.x = 0;
+    this.y = 0;
+
     const keyMap = {
         0: 0, 2: 1, 4: 2, 5: 3, 7: 4, 9: 5, 11: 6, 12: 7,
         1: 0, 3: 1, 6: 2, 8: 3, 10: 4
@@ -21,12 +24,16 @@ function Piano() {
         this.blackKeyHeight = this.whiteKeyHeight * 3 / 5;
     };
 
+    this.setPosition = function(x, y) {
+        this.x = x;
+        this.y = y;
+    };
+
     function isBlack(key) {
         return [1,3,6,8,10].indexOf(key) >= 0;
     }
 
     this.getKeyPosition = function(key) {
-        console.log(key);
         if (isBlack(key)) {
             var pos = this.blackKeyBodies[keyMap[key]].state.pos;
             var x = pos.x, y = pos.y;
@@ -87,7 +94,10 @@ function Piano() {
     };
 
 
-    this.draw = function(world, x, y) {
+    this.draw = function(world) {
+        var x = this.x;
+        var y = this.y;
+
         if (this.whiteKeyBodies.length)
             return;
 
@@ -119,7 +129,6 @@ function Piano() {
             var pos = blackKeyPos[i];
             var startX = x + pos * this.whiteKeyWidth + this.whiteKeyWidth / 2;
             var startY = y + (this.blackKeyHeight - this.whiteKeyHeight) / 2;
-            console.log(startX, startY);
             this.blackKeyBodies.push(
                 Physics.body('rectangle', {
                     x: startX
@@ -139,8 +148,7 @@ function Piano() {
     }
 }
 
-function Projectile(size, color, life) {
-    var that = this;
+function Projectile(size, note, life) {
 
     var body = Physics.body('convex-polygon', {
          x: 0
@@ -151,8 +159,9 @@ function Projectile(size, color, life) {
             ,{x:0, y:2*size}
         ]
         ,styles: {
-             fillStyle: color
+             fillStyle: PitchClassMapping.pitchClassToColor[note%12]
         }
+        ,note: note
         ,treatment: 'kinematic'
         ,angle: Math.PI
         ,despawn: true
@@ -181,6 +190,7 @@ function Projectile(size, color, life) {
         }
     });
 
+    this.body = body;
 
     this.spawn = function(world, x, y, vel) {
         if (x && y) {
@@ -208,6 +218,33 @@ function BackgroundLine(width, height, color, life) {
         ,onTick: function(dt, body, world) {
         }
     });
+
+    this.spawn = function(world, x, vel) {
+        if (x) {
+            body.state.pos.x = x;
+            body.state.vel.y = vel;
+        }
+        world.add(body);
+    }
+}
+
+function Target(width, height, color) {
+    var body = Physics.body('rectangle', {
+        x: 0
+        ,y: -height / 2
+        ,width: width
+        ,height: height
+        ,mass: 10000
+        ,styles: {
+            fillStyle: color
+        }
+        ,despawn: true
+        ,life: 100000
+        ,treatment: 'kinematic'
+        ,collision: false
+    });
+
+    this.body = body;
 
     this.spawn = function(world, x, vel) {
         if (x) {
