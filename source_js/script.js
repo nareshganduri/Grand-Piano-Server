@@ -262,9 +262,6 @@ var physicsEngine = Physics(function (world) {
 
         gameModel.update(dt, world);
 
-        if (Math.random() < 0.5)
-            new BackgroundLine(2, (Math.random() * 400) + 50, '#aaa', 3000).spawn(world, Math.random() * width, 1);
-
         world.find({despawn:true}).forEach(function(p) {
             if (!p.life || p.life <= 0) {
                 world.remove(p);
