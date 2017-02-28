@@ -229,11 +229,14 @@ function BackgroundLine(width, height, color, life) {
 }
 
 function Target(width, height, color) {
-    var body = Physics.body('rectangle', {
+    var body = Physics.body('convex-polygon', {
         x: 0
         ,y: -height / 2
-        ,width: width
-        ,height: height
+        ,vertices: [
+            {x: -1*width, y: 0}
+            ,{x: 1*width, y: 0}
+            ,{x:0, y:2*height}
+        ]
         ,mass: 10000
         ,styles: {
             fillStyle: color
@@ -244,12 +247,14 @@ function Target(width, height, color) {
         ,collision: false
     });
 
+    body.state.angular.vel = 0.005;
+
     this.body = body;
 
-    this.spawn = function(world, x, vel) {
+    this.spawn = function(world, x, y) {
         if (x) {
             body.state.pos.x = x;
-            body.state.vel.y = vel;
+            body.state.pos.y = y;
         }
         world.add(body);
     }

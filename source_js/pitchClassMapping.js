@@ -14,6 +14,18 @@ function mapPitch(pitch, color) {
         "color": color
     }
 }
+
+PitchClassMapping.chordNameToNotes = {
+    I: [0, 4, 7]
+    ,ii: [2, 5, 9]
+    ,iii: [4, 7, 11]
+    ,III: [4, 8, 11]
+    ,IV: [0, 5, 9]
+    ,V: [2, 7, 11]
+    ,vi: [0, 4, 9]
+    ,vii_dim: [2, 5, 11]
+};
+
 PitchClassMapping.pitchClassToNoteName = {
     0: "C",
     1: "C#",
