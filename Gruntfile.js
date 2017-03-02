@@ -22,7 +22,8 @@ module.exports = function(grunt) {
           'public/js/midiHandler.js': ['source_js/midiHandler.js'],
           'public/js/pitchClassMapping.js': ['source_js/pitchClassMapping.js'],
           'public/js/hexcolorUtil.js': ['source_js/hexcolorUtil.js'],
-           'public/js/shapes.js': ['source_js/shapes.js']
+          'public/js/shapes.js': ['source_js/shapes.js'],
+            'public/js/gameModel.js': ['source_js/gameModel.js']
         } //files
       } //my_target
     }, //uglify

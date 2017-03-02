@@ -54,7 +54,7 @@ function MidiHandler(Pizzicato) {
         sound.play();
         setTimeout(function () {
             sound.stop();
-        }, 200);
+        }, 100);
     }
 
     this.play = function (midiNumber) {

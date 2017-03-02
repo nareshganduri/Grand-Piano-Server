@@ -6,7 +6,7 @@
 
 /* global PitchClassMapping */
 
-function InputHandler(Physics, Pizzicato, world, regularPolygon, width, height, piano) {
+function InputHandler(Physics, Pizzicato, world, regularPolygon, width, height, piano, gameModel) {
 
     var baseOctave = 60;
     var heldNotes = [];
@@ -44,21 +44,20 @@ function InputHandler(Physics, Pizzicato, world, regularPolygon, width, height, 
                     },
                     note: midiNumber,
                     vol: 1,
-                    opacity: 1
+                    opacity: 1,
+                    despawn: true
                 });
 
                 circle.note = midiNumber;
                 circle.life = BALL_LIFE;
-                world.add(circle);
-
+                // world.add(circle);
 
                 var pianoKey = parseInt(map["pitch"]);
                 piano.setKeysActive([pianoKey]);
-                var keyPos = piano.getKeyPosition(pianoKey);
 
-                new Projectile(20, map["color"], 1000).spawn(world, keyPos.x, keyPos.y, -1);
+                gameModel.spawnProjectile(world, pianoKey);
 
-                receiveInput(midiNumber);
+                // receiveInput(midiNumber);
             }
         };
 
@@ -101,7 +100,6 @@ function InputHandler(Physics, Pizzicato, world, regularPolygon, width, height, 
                             fillStyle: '#ffffff'
                             , lineWidth: 1
                             , strokeStyle: '#ffffff'
-
                         }
                         , children: regularPolygon(num_sides, 100)
                     });

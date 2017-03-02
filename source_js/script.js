@@ -9,9 +9,10 @@ var zero_ang_vel = 0.001;
 var num_sides = 3;
 var width = window.innerWidth
     ,height = window.innerHeight;
-var BALL_LIFE = 10;
+var BALL_LIFE = 10000;
 
 var physicsEngine = Physics(function (world) {
+
     // bounds of the window
     var viewportBounds = Physics.aabb(0, 0, window.innerWidth, window.innerHeight)
     ,edgeBounce
@@ -75,6 +76,11 @@ var physicsEngine = Physics(function (world) {
 
     var piano = new Piano();
 
+    piano.setDimension(S(200), S(100));
+    piano.setPosition(width / 2, height - 150);
+
+    var gameModel = new GameModel(piano);
+
     ///////////////////////////////////////////////////PHYSICS////////////////////////////////////////////////////////////
     // Plz give me a number > 3
     var regularPolygon = function (N, r, width, mass) {
@@ -108,7 +114,6 @@ var physicsEngine = Physics(function (world) {
     };
 
     var spawnCircle = function (x, y, r, color, note) {
-        console.log(note);
         var circle = Physics.body('circle', {
             x: x
             , y: y
@@ -130,7 +135,7 @@ var physicsEngine = Physics(function (world) {
         return n * window.innerWidth / 600;
     }
 
-    var input = new InputHandler(Physics, Pizzicato, world, regularPolygon, width, height, piano);
+    var input = new InputHandler(Physics, Pizzicato, world, regularPolygon, width, height, piano, gameModel);
     // some fun colors
     var colors = {
         blue: '0x1d6b98',
@@ -188,48 +193,59 @@ var physicsEngine = Physics(function (world) {
     world.add([
         Physics.behavior('interactive', { el: renderer.container }),
 
-        Physics.behavior('body-impulse-response')
+        Physics.behavior('body-impulse-response', {check: 'collisions:desired'})
         , Physics.behavior('body-collision-detection')
         , Physics.behavior('sweep-prune')
         , edgeBounce
     ]);
 
-    piano.draw(world, width / 2, height - 150);
+    piano.draw(world);
 
     world.on('collisions:detected', function(data) {
+        data.collisions = data.collisions.filter(function(c) {
+            return c.bodyA.collision != false && c.bodyB.collision != false;
+        });
+
+        if (data.collisions.length == 0) return;
 
         var bodyA = data.collisions[0].bodyA;
         var bodyB = data.collisions[0].bodyB;
 
-        if (bodyA.note) {
+        world.emit('collisions:desired', data);
+    });
+
+    world.on('collisions:desired', function(data) {
+
+        var bodyA = data.collisions[0].bodyA;
+        var bodyB = data.collisions[0].bodyB;
+
+        if (bodyA.note && !bodyB.note) {
             midiHandler.receiveMidiNumber(bodyA.note, bodyA.vol);
 
             // TODO: Change function of decreasing volume?
-            bodyA.vol -= 1/BALL_LIFE;
-            bodyA.life--;
-            bodyA.styles.fillStyle = shadeBlendConvert(-(1.5/BALL_LIFE), bodyA.styles.fillStyle);
-            bodyA.view = null;
-            bodyA.recalc();
+            // bodyA.vol -= 1/BALL_LIFE;
+            // bodyA.life--;
+            // bodyA.styles.fillStyle = shadeBlendConvert(-(100/BALL_LIFE), bodyA.styles.fillStyle);
+            // bodyA.view = null;
+            // bodyA.recalc();
 
-            if (bodyA.life <= 0) {
-                world.remove(bodyA);
-            }
+            // if (bodyA.life <= 0) {
+            //     world.remove(bodyA);
+            // }
         }
-        if (bodyB.note) {
-            midiHandler.receiveMidiNumber(bodyB.note, bodyB.vol)
-            bodyB.vol -= 1/BALL_LIFE
-            bodyB.life--;
-            bodyB.styles.fillStyle = shadeBlendConvert(-(1.5/BALL_LIFE), bodyB.styles.fillStyle);
-            bodyB.view = null;
-            bodyB.recalc();
+        if (bodyB.note && !bodyA.note) {
+            midiHandler.receiveMidiNumber(bodyB.note, bodyB.vol);
+            // bodyB.vol -= 1/BALL_LIFE
+            // bodyB.life--;
+            // bodyB.styles.fillStyle = shadeBlendConvert(-(100/BALL_LIFE), bodyB.styles.fillStyle);
+            /// bodyB.view = null;
+            // bodyB.recalc();
 
-            if (bodyB.life <= 0) {
-                world.remove(bodyB);
-            }
+            // if (bodyB.life <= 0) {
+            //     world.remove(bodyB);
+            // }
         }
-
     });
-
 
     var laskTick = null;
     // subscribe to ticker to advance the simulation
@@ -244,7 +260,9 @@ var physicsEngine = Physics(function (world) {
         var dt = time - laskTick;
         laskTick = time;
 
-        world.find({'class':'projectile'}).forEach(function(p) {
+        gameModel.update(dt, world);
+
+        world.find({despawn:true}).forEach(function(p) {
             if (!p.life || p.life <= 0) {
                 world.remove(p);
             }
