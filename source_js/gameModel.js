@@ -1,62 +1,14 @@
 
-// var env   = T("adsr", {a:0, d:1000, s:0, r:600});
+var env   = T("adsr", {a:0, d:1000, s:0, r:600});
 
-// var env = T("perc", {r:1000});
-// var synth = T("SynthDef", {mul:0.45, poly:4});
-// synth.def = function(opts) {
-//     var op1 = T("sin", {freq:opts.freq*6, fb:0.25, mul:0.4});
-//     var op2 = T("sin", {freq:opts.freq, phase:op1, mul:0.4});
-//     return env.clone().append(op2).on("ended", opts.doneAction).bang();
-// };
-// synth.play();
-//
-// function MusicBox() {
-//     var tickCounter = 0;
-//     var beatPerMeasure = 4;
-//     var tickPerBeat = 4;
-//
-//     var noteScramble = [];
-//
-//     this.addNote = function(note) {
-//         if (noteScramble.indexOf(note) < 0)
-//             noteScramble.push(note);
-//     };
-//
-//     this.clearNotes = function() {
-//         noteScramble = [];
-//     };
-//
-//     this.playNote = function() {
-//         if (noteScramble.length == 0) return;
-//         synth.noteOn(60 + noteScramble[Math.floor(Math.random() * noteScramble.length)], 100);
-//     };
-//
-//     // advance tick by 1, by default that is 1/4 beat
-//     this.nextTick = function() {
-//         tickCounter += 1;
-//         if (this.currentBeat() == 0 && this.currentTickInBeat() == 0) {
-//             this.clearNotes();
-//         }
-//         this.playNote();
-//     };
-//
-//     this.currentTick = function() {
-//         return tickCounter;
-//     };
-//
-//     this.currentTickInBeat = function() {
-//         return tickCounter % tickPerBeat;
-//     };
-//
-//     this.currentBeat = function() {
-//         return Math.floor(tickCounter / tickPerBeat) % beatPerMeasure;
-//     };
-//
-//     this.currentMeasure = function() {
-//         return Math.floor(tickCounter / (tickPerBeat * beatPerMeasure));
-//     };
-// }
-
+var env = T("perc", {r:1000});
+var synth = T("SynthDef", {mul:0.45, poly:4});
+synth.def = function(opts) {
+    var op1 = T("sin", {freq:opts.freq*6, fb:0.25, mul:0.4});
+    var op2 = T("sin", {freq:opts.freq, phase:op1, mul:0.4});
+    return env.clone().append(op2).on("ended", opts.doneAction).bang();
+};
+synth.play();
 
 function GameModel(piano) {
 
@@ -67,28 +19,19 @@ function GameModel(piano) {
 
     setTempo(160);
 
-    var currentChord = null;
-
-    function cntn(name) {
-        return PitchClassMapping.chordNameToNotes[name]
-    }
-    var chordQueue = ['I', 'vi', 'IV', 'V'].map(cntn);
-
-    var melodyQueue = [];
-
     var timeInBeat = 0;
 
     this.setTempo = setTempo;
 
     var musicBox = new MusicBox();
+    var musicGen = new MusicGen();
 
     function nextChord() {
-        currentChord = chordQueue.shift();
-        chordQueue.push(currentChord);
+        return musicGen.popNextChord();
     }
 
     function nextMelody() {
-        return melodyQueue.shift();
+        return musicGen.generateMelody();
     }
 
     var projectiles = [[],[],[],[],[],[],[],[],[],[],[],[],[]];
@@ -104,6 +47,13 @@ function GameModel(piano) {
         var target = new Target(20, 30, PitchClassMapping.pitchClassToColor[note%12]);
         target.spawn(world, piano.getKeyPosition(note).x, 100);
         targets[note].push(target);
+    }
+
+    function targetsEmpty() {
+        for (var i = 0; i < targets.length; i++) {
+            if (targets[i].length != 0) return false;
+        }
+        return true;
     }
 
     function update(dt, world) {
@@ -133,6 +83,8 @@ function GameModel(piano) {
                 targetBody.life = 0;
                 var pos = targetBody.state.pos;
 
+                nextMelody();
+
                 for (var i = 0; i < 8; i++) {
                     var particle = Physics.body('rectangle', {
                         x: pos.x
@@ -154,6 +106,14 @@ function GameModel(piano) {
                     world.add(particle);
                 }
             }
+
+            if (targetsEmpty()) {
+                var chord = nextChord();
+                chord.forEach(function(note) {
+                    spawnTarget(world, note);
+                })
+            }
+
         }
 
         // time counter reaches a new beat
