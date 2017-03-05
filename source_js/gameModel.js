@@ -1,75 +1,71 @@
 
 // var env   = T("adsr", {a:0, d:1000, s:0, r:600});
 
-var env = T("perc", {r:1000});
-var synth = T("SynthDef", {mul:0.45, poly:4});
-synth.def = function(opts) {
-    var op1 = T("sin", {freq:opts.freq*6, fb:0.25, mul:0.4});
-    var op2 = T("sin", {freq:opts.freq, phase:op1, mul:0.4});
-    return env.clone().append(op2).on("ended", opts.doneAction).bang();
-};
-synth.play();
-
-function MusicBox() {
-    var tickCounter = 0;
-    var beatPerMeasure = 4;
-    var tickPerBeat = 4;
-
-    var noteScramble = [];
-
-    this.addNote = function(note) {
-        if (noteScramble.indexOf(note) < 0)
-            noteScramble.push(note);
-    };
-
-    this.clearNotes = function() {
-        noteScramble = [];
-    };
-
-    this.playNote = function() {
-        if (noteScramble.length == 0) return;
-        synth.noteOn(60 + noteScramble[Math.floor(Math.random() * noteScramble.length)], 100);
-    };
-
-    // advance tick by 1, by default that is 1/4 beat
-    this.nextTick = function() {
-        tickCounter += 1;
-        if (this.currentBeat() == 0 && this.currentTickInBeat() == 0) {
-            this.clearNotes();
-        }
-        this.playNote();
-    };
-
-    this.currentTick = function() {
-        return tickCounter;
-    };
-
-    this.currentTickInBeat = function() {
-        return tickCounter % tickPerBeat;
-    };
-
-    this.currentBeat = function() {
-        return Math.floor(tickCounter / tickPerBeat) % beatPerMeasure;
-    };
-
-    this.currentMeasure = function() {
-        return Math.floor(tickCounter / (tickPerBeat * beatPerMeasure));
-    };
-}
+// var env = T("perc", {r:1000});
+// var synth = T("SynthDef", {mul:0.45, poly:4});
+// synth.def = function(opts) {
+//     var op1 = T("sin", {freq:opts.freq*6, fb:0.25, mul:0.4});
+//     var op2 = T("sin", {freq:opts.freq, phase:op1, mul:0.4});
+//     return env.clone().append(op2).on("ended", opts.doneAction).bang();
+// };
+// synth.play();
+//
+// function MusicBox() {
+//     var tickCounter = 0;
+//     var beatPerMeasure = 4;
+//     var tickPerBeat = 4;
+//
+//     var noteScramble = [];
+//
+//     this.addNote = function(note) {
+//         if (noteScramble.indexOf(note) < 0)
+//             noteScramble.push(note);
+//     };
+//
+//     this.clearNotes = function() {
+//         noteScramble = [];
+//     };
+//
+//     this.playNote = function() {
+//         if (noteScramble.length == 0) return;
+//         synth.noteOn(60 + noteScramble[Math.floor(Math.random() * noteScramble.length)], 100);
+//     };
+//
+//     // advance tick by 1, by default that is 1/4 beat
+//     this.nextTick = function() {
+//         tickCounter += 1;
+//         if (this.currentBeat() == 0 && this.currentTickInBeat() == 0) {
+//             this.clearNotes();
+//         }
+//         this.playNote();
+//     };
+//
+//     this.currentTick = function() {
+//         return tickCounter;
+//     };
+//
+//     this.currentTickInBeat = function() {
+//         return tickCounter % tickPerBeat;
+//     };
+//
+//     this.currentBeat = function() {
+//         return Math.floor(tickCounter / tickPerBeat) % beatPerMeasure;
+//     };
+//
+//     this.currentMeasure = function() {
+//         return Math.floor(tickCounter / (tickPerBeat * beatPerMeasure));
+//     };
+// }
 
 
 function GameModel(piano) {
 
     var tempo;
-    var tickTime;
     function setTempo(bpm) {
         tempo = bpm;
-        tickTime = 60000 / tempo / 4;
     }
 
-    var musicBox = new MusicBox();
-
-    setTempo(80);
+    setTempo(160);
 
     var currentChord = null;
 
@@ -80,9 +76,11 @@ function GameModel(piano) {
 
     var melodyQueue = [];
 
-    var timeInTick = 0;
+    var timeInBeat = 0;
 
     this.setTempo = setTempo;
+
+    var musicBox = new MusicBox();
 
     function nextChord() {
         currentChord = chordQueue.shift();
@@ -109,10 +107,7 @@ function GameModel(piano) {
     }
 
     function update(dt, world) {
-        if (!gameActive) {
-            return;
-        }
-        timeInTick += dt;
+        timeInBeat += dt;
 
         if (Math.random() < 0.5) {
             var color;
@@ -135,9 +130,6 @@ function GameModel(piano) {
                 var targetBody = targets[i].shift().body;
                 targetBody.life = 0;
                 var pos = targetBody.state.pos;
-
-                musicBox.addNote(i);
-                console.log(i);
 
                 for (var i = 0; i < 8; i++) {
                     var particle = Physics.body('rectangle', {
@@ -162,61 +154,42 @@ function GameModel(piano) {
             }
         }
 
-        if (timeInTick > tickTime) {
-            timeInTick -= tickTime;
-            musicBox.nextTick();
-            console.log(musicBox.currentBeat());
-            if (musicBox.currentBeat() == 0) {
+        // time counter reaches a new beat
+        if (timeInBeat > 60000 / tempo) {
+            timeInBeat -= 60000 / tempo;
 
-                var targetsExist = false;
-                for (var i = 0; i < targets.length; i++) {
-                    if (targets[i].length != 0) {
-                        targetsExist = true;
-                        break;
-                    }
-                }
+            musicBox.onBeat();
 
-                if (!targetsExist) {
-                    nextChord();
-                    if (currentChord) {
-                        currentChord.forEach(function(note) {
-                            spawnTarget(world, note);
+            for (var i = 0; i < 13; i++) {
+                for (var j = 0; j < targets[i].length; j++) {
+                    var pos = targets[i][j].body.state.pos;
+                    var style = targets[i][j].body.styles.fillStyle;
+                    var velY = targets[i][j].body.state.vel.y;
+
+                    for (var k = 0; k < 10; k++) {
+                        var particle = Physics.body('rectangle', {
+                            x: pos.x
+                            ,y: pos.y
+                            ,width: 10
+                            ,height: 10
+                            ,styles: {
+                                fillStyle: style
+                            }
+                            ,treatment: 'kinematic'
+                            ,angle: Math.random() * 2 * Math.PI
+                            ,despawn: true
+                            ,collision: false
+                            ,life: Math.random() * 1000
                         });
-                    }
-                }
-            }
 
-            if (musicBox.currentTickInBeat() == 0) {
-                for (var i = 0; i < 13; i++) {
-                    for (var j = 0; j < targets[i].length; j++) {
-                        var pos = targets[i][j].body.state.pos;
-                        var style = targets[i][j].body.styles.fillStyle;
-                        var velY = targets[i][j].body.state.vel.y;
-
-                        for (var k = 0; k < 10; k++) {
-                            var particle = Physics.body('rectangle', {
-                                x: pos.x
-                                ,y: pos.y
-                                ,width: 10
-                                ,height: 10
-                                ,styles: {
-                                    fillStyle: style
-                                }
-                                ,treatment: 'kinematic'
-                                ,angle: Math.random() * 2 * Math.PI
-                                ,despawn: true
-                                ,collision: false
-                                ,life: Math.random() * 1000
-                            });
-
-                            particle.state.vel.x = (Math.random() - 0.5) / 4;
-                            particle.state.vel.y = (Math.random()-0.5) / 2 + velY;
-                            world.add(particle);
-                        }
+                        particle.state.vel.x = (Math.random() - 0.5) / 4;
+                        particle.state.vel.y = (Math.random()-0.5) / 2 + velY;
+                        world.add(particle);
                     }
                 }
             }
         }
+
     }
     this.update = update;
 }
