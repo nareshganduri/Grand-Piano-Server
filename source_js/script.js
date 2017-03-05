@@ -10,6 +10,8 @@ var num_sides = 3;
 var width = window.innerWidth
     ,height = window.innerHeight;
 var BALL_LIFE = 10000;
+var gameActive = true;
+var instantFeedback = true;
 
 var physicsEngine = Physics(function (world) {
 
@@ -221,29 +223,9 @@ var physicsEngine = Physics(function (world) {
 
         if (bodyA.note && !bodyB.note) {
             midiHandler.receiveMidiNumber(bodyA.note, bodyA.vol);
-
-            // TODO: Change function of decreasing volume?
-            // bodyA.vol -= 1/BALL_LIFE;
-            // bodyA.life--;
-            // bodyA.styles.fillStyle = shadeBlendConvert(-(100/BALL_LIFE), bodyA.styles.fillStyle);
-            // bodyA.view = null;
-            // bodyA.recalc();
-
-            // if (bodyA.life <= 0) {
-            //     world.remove(bodyA);
-            // }
         }
         if (bodyB.note && !bodyA.note) {
             midiHandler.receiveMidiNumber(bodyB.note, bodyB.vol);
-            // bodyB.vol -= 1/BALL_LIFE
-            // bodyB.life--;
-            // bodyB.styles.fillStyle = shadeBlendConvert(-(100/BALL_LIFE), bodyB.styles.fillStyle);
-            /// bodyB.view = null;
-            // bodyB.recalc();
-
-            // if (bodyB.life <= 0) {
-            //     world.remove(bodyB);
-            // }
         }
     });
 
@@ -259,7 +241,7 @@ var physicsEngine = Physics(function (world) {
         }
         var dt = time - laskTick;
         laskTick = time;
-
+        
         gameModel.update(dt, world);
 
         world.find({despawn:true}).forEach(function(p) {

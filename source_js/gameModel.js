@@ -109,6 +109,9 @@ function GameModel(piano) {
     }
 
     function update(dt, world) {
+        if (!gameActive) {
+            return;
+        }
         timeInTick += dt;
 
         if (Math.random() < 0.5) {

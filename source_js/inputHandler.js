@@ -28,15 +28,15 @@ function InputHandler(Physics, Pizzicato, world, regularPolygon, width, height, 
 
         var zero = world.findOne({ 'treatment': 'kinematic' });
 
-        window.onkeydown = function(e) {
+        window.onkeydown = function (e) {
             var keyPressed = String.fromCharCode(e.keyCode).toLowerCase();
             if (keyPressed in PitchClassMapping.keyboardCharToPitchClass) {
                 var map = PitchClassMapping.keyboardCharToPitchClass[keyPressed];
 
                 var midiNumber = baseOctave + parseInt(map["pitch"]);
                 var circle = Physics.body('circle', {
-                    x: width/2
-                    , y: height/2
+                    x: width / 2
+                    , y: height / 2
                     , mass: 1
                     , radius: 10
                     , styles: {
@@ -56,8 +56,16 @@ function InputHandler(Physics, Pizzicato, world, regularPolygon, width, height, 
                 piano.setKeysActive([pianoKey]);
 
                 gameModel.spawnProjectile(world, pianoKey);
-
-                // receiveInput(midiNumber);
+                if (instantFeedback) {
+                    synth.noteOn(midiNumber, 100);
+                }
+            }
+            if (keyPressed == "p") {
+                console.log(gameActive);
+                gameActive = !gameActive;
+            }
+            if (keyPressed == "m") {
+                instantFeedback = !instantFeedback;
             }
         };
 
