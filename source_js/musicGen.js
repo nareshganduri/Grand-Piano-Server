@@ -105,7 +105,8 @@ function MusicGen() {
             if (i % 2 == 1 && Math.random() < 0.5) {
                 melody.push(-1);
             }
-            melody.push(allNotes.randomOne());
+            else
+                melody.push(allNotes.randomOne());
         }
         console.log('melody generated:', melody);
         return melody;

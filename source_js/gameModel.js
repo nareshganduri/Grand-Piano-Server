@@ -1,15 +1,4 @@
 
-var env   = T("adsr", {a:0, d:1000, s:0, r:600});
-
-var env = T("perc", {r:1000});
-var synth = T("SynthDef", {mul:0.45, poly:4});
-synth.def = function(opts) {
-    var op1 = T("sin", {freq:opts.freq*6, fb:0.25, mul:0.4});
-    var op2 = T("sin", {freq:opts.freq, phase:op1, mul:0.4});
-    return env.clone().append(op2).on("ended", opts.doneAction).bang();
-};
-synth.play();
-
 function GameModel(piano) {
 
     var tempo;
@@ -17,7 +6,7 @@ function GameModel(piano) {
         tempo = bpm;
     }
 
-    setTempo(160);
+    setTempo(200);
 
     var timeInBeat = 0;
 
@@ -83,7 +72,8 @@ function GameModel(piano) {
                 targetBody.life = 0;
                 var pos = targetBody.state.pos;
 
-                nextMelody();
+                var melody = nextMelody();
+                musicBox.playMelody(melody);
 
                 for (var i = 0; i < 8; i++) {
                     var particle = Physics.body('rectangle', {
@@ -109,6 +99,7 @@ function GameModel(piano) {
 
             if (targetsEmpty()) {
                 var chord = nextChord();
+                musicBox.playChord(chord);
                 chord.forEach(function(note) {
                     spawnTarget(world, note);
                 })
